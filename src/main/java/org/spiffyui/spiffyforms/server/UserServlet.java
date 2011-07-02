@@ -40,7 +40,7 @@ public class UserServlet extends HttpServlet
 {
 
     private static final long serialVersionUID = -1L;
-    private static final JSONArray USERS;
+    private static final JSONArray USERS = null;
     
     public UserServlet()
     {
@@ -56,11 +56,11 @@ public class UserServlet extends HttpServlet
 
 
         if (user.startsWith("/")) {    // it is supposed to
-            user = path.substring(1);
+            //user = path.substring(1);
         }
 
 
-        if (user.equals("") {
+        if (user.equals("")) {
             // they are asking for the list of users
             // which we are just keeping in memory in this servlet
             // because this is a sample app
