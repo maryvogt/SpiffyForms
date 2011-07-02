@@ -23,13 +23,29 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 /**
- * This servlet returns the user and browser and server info.
- */
-public class SimpleServlet extends HttpServlet
+ * This servlet returns TODO
+ * GET - get list of users or get individual user
+ * POST - modify existing user
+ * PUT - add new user
+ * DELETE - delete a user
+ * 
+ * 
+ *  */
+public class UserServlet extends HttpServlet
 {
 
     private static final long serialVersionUID = -1L;
+    private static final JSONArray USERS;
+    
+    public UserServlet()
+    {
+        
+    }
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -37,26 +53,34 @@ public class SimpleServlet extends HttpServlet
             IOException
     {
         String user = request.getPathInfo();
-        if (user.startsWith("/")) {
-            user = user.substring(1);
+
+
+        if (user.startsWith("/")) {    // it is supposed to
+            user = path.substring(1);
         }
-        String serverInfo = getServletContext().getServerInfo();
-        String userAgent = request.getHeader("User-Agent");
-        
+
+
+        if (user.equals("") {
+            // they are asking for the list of users
+            // which we are just keeping in memory in this servlet
+            // because this is a sample app
+
+        } else {
+            // they are asking for one user
+            
+        }
+
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         
         /*
-         We just need to return some simple JSON for this REST call.
+           so what are we going to return?
          */
-        StringBuffer sb = new StringBuffer();
-        sb.append("{");
-        sb.append("\"user\": \"" + user + "\"");
-        sb.append(",");
-        sb.append("\"userAgent\": \"" + userAgent + "\"");
-        sb.append(",");
-        sb.append("\"serverInfo\": \"" + serverInfo + "\"");
-        sb.append("}");
-        out.println(sb.toString());
+
+        // do they want all the users or just a single user? The URL tells us.
+        // .../users
+        // .../users/Mary
+        
+
     }
 }
