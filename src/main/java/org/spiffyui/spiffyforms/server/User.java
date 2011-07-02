@@ -17,6 +17,7 @@ package org.spiffyui.spiffyforms.server;
 
 
 import javax.ws.rs.GET;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Produces;
@@ -65,5 +66,17 @@ public class User {
 
         // Return some cliched textual content
         return "you updated user " + arg1 + " with: " + input;
+    }
+
+    @DELETE 
+    // The Java method will produce content identified by the MIME Media
+    // type "text/plain"
+    @Produces("text/plain")
+    public String deleteUser(String input) {
+        MultivaluedMap<String, String> params = uriInfo.getPathParameters();
+        String arg1 = params.getFirst("arg1");
+
+        // Return some cliched textual content
+        return "you deleted user " + arg1 + " with: " + input;
     }
 }
