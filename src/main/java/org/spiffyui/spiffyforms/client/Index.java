@@ -87,12 +87,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private TextArea m_userDesc;
     private FormFeedback m_userDescFeedback;
 
-    private TextArea m_securityQuestion;
-    private FormFeedback m_securityQuestionFeedback;
-
-    private TextBox m_securityAnswer;
-    private FormFeedback m_securityAnswerFeedback;
-
     private FancyButton m_save;
 
     private List<FormFeedback> m_feedbacks = new ArrayList<FormFeedback>();
@@ -114,7 +108,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
          displays our title bar at the top of our page.
          */
         MainHeader header = new MainHeader();
-        header.setHeaderTitle("Hello Spiffy SpiffyForms!");
+        header.setHeaderTitle("SpiffyForms Sample App");
         
         /*
          The main footer shows our message at the bottom of the page.
@@ -255,32 +249,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_passwordRepeatFeedback = new FormFeedback();
         m_feedbacks.add(m_passwordRepeatFeedback);
         panel.add(m_passwordRepeatFeedback, "passwordRepeatRow");
-
-        /*
-         Security Question
-         */
-        m_securityQuestion = new TextArea();
-        m_securityQuestion.addKeyUpHandler(this);
-        m_securityQuestion.getElement().setId("securityQuestionTxt");
-        m_securityQuestion.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_securityQuestion, "securityQuestion");
-
-        m_securityQuestionFeedback = new FormFeedback();
-        m_feedbacks.add(m_securityQuestionFeedback);
-        panel.add(m_securityQuestionFeedback, "securityQuestionRow");
-
-        /*
-         Security answer
-         */
-        m_securityAnswer = new TextBox();
-        m_securityAnswer.addKeyUpHandler(this);
-        m_securityAnswer.getElement().setId("securityAnswerTxt");
-        m_securityAnswer.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_securityAnswer, "securityAnswer");
-
-        m_securityAnswerFeedback = new FormFeedback();
-        m_feedbacks.add(m_securityAnswerFeedback);
-        panel.add(m_securityAnswerFeedback, "securityAnswerRow");
 
 
 
