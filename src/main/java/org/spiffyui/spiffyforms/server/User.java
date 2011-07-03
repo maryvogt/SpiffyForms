@@ -33,36 +33,13 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.WebApplicationException;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 // The Java class will be hosted at the URI path "/users"
 @Path("/users/{arg1}")
 public class User {
-
-    HashMap m_users; 
-
-    // Constructor
-    User()
-    {
-        m_users = new HashMap(); 
-        // add a couple of hardcoded demo users
-        UserDetailsBean alice = new UserDetailsBean( "aadams", 
-                                                     "Alice", 
-                                                     "Adams", 
-                                                     "aadams@amazon.com", 
-                                                     "passw0rd",
-                                                     "04/01/1974");
-        UserDetailsBean bob = new UserDetailsBean("bbrown", 
-                                                  "Bob",
-                                                  "Brown", 
-                                                  "bbrown@bn.com",
-                                                  "b0bpass",
-                                                  "10/21/1981");
-        m_users.put(alice.getUserID(), alice);
-        m_users.put(bob.getUserID(), bob);
-
-
-
-
-    }
 
     @Context UriInfo uriInfo;
 
@@ -70,26 +47,46 @@ public class User {
     @GET 
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
-    @Produces("application/JSON")
+    //    @Produces("application/JSON")
     // This method returns a JSONObject containing the user info 
-    // for the user named in the arg1 parameter on the URL
-    public UserDetailsBean getUserInfo() {
+    // for the userID passed in the arg1 parameter on the URL
+    public String getUserInfo() {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
-        String userid= params.getFirst("arg1");
+        String userid = params.getFirst("arg1");
+	
+	if (userid == null){
+	    throw new WebApplicationException(400);
+	}
+	    
+	JSONArray users = Users.getUserList();
+	if (users == null)
+	    return null;
 
-        UserDetailsBean user = (UserDetailsBean)m_users.get(userid);
-        if (user != null) {
-            // found this user, return info
-            return user;
-        }
-        else
-        {
-            // 404
-            // If you want to add more information to the error, then write a subclass of 
-            // WebApplicationException and throw that. 
-            throw new WebApplicationException(Response.Status.NOT_FOUND);
-        }
+
+	JSONObject user = null;
+
+
+	int len = users.length();
+	try {
+	    for (int i=0; i<len; i++) {
+		user = users.getJSONObject(i);
+
+		if (user != null){
+		    String id = user.getString("userID");
+		    if (userid.equals(id)){
+			// found it!
+			return user.toString();
+		    }
+		}
+	    }
+	} catch (JSONException je){
+	    // not going to happen in this demo app
+	}
+		    
+	// if we got here then we didn't find it
+	throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+
 
     @POST 
     // The Java method will produce content identified by the MIME Media
