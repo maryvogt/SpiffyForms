@@ -19,6 +19,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONBoolean;
+import com.google.gwt.json.client.JSONNumber;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
+import com.google.gwt.json.client.JSONValue;
+
+
 import org.spiffyui.client.widgets.DatePickerTextBox;
 import org.spiffyui.client.widgets.button.FancyButton;
 import org.spiffyui.client.widgets.button.FancySaveButton;
@@ -77,7 +85,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private TextBox m_text = new TextBox();
     private LongMessage m_longMessage = new LongMessage("longMsgPanel");   
 
-    //    private Grid m_userListGrid;
+    // this is all going to be filled in dynamically
+    private HTMLPanel m_userListPanel = new HTMLPanel("");
 
     private TextBox m_firstName;
     private FormFeedback m_firstNameFeedback;
@@ -129,31 +138,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         MainFooter footer = new MainFooter();
         footer.setFooterString("SpiffyForms was built with the <a href=\"http://www.spiffyui.org\">Spiffy UI Framework</a>");
 	
-	/*
-	  This HTMLPanel holds the list of users
-	  UserListPanel_html was built from UserListPanel.html by the
-	  HTMLProps task, which allows you to use large passages
-	  of HTML without having to string escape them.
-	*/
-	HTMLPanel userListPanel = new HTMLPanel(STRINGS.UserListPanel_html());
-	RootPanel.get("mainContent").add(userListPanel);
-
-	String panelHTML = userListPanel.getElement().getInnerHTML();
-	
-	panelHTML += BEGIN_GRID;
-	for (int r = 0; r < 9; r++){
-	    if (r%2 == 0){ //even
-		panelHTML += BEGIN_GRID_EVEN_ROW;
-	    } else { //odd
-		panelHTML += BEGIN_GRID_ODD_ROW;
-	    }
-	    panelHTML += BEGIN_USERID_COL + "userID" + r + END_COL;
-	    panelHTML += BEGIN_FULLNAME_COL + "fullName" + r + END_COL;
-	    panelHTML += END_ROW;
-	}
-	panelHTML += END_GRID;
-
-	userListPanel.getElement().setInnerHTML(panelHTML);
+	sendUsersRequest();
 
         // /*
         //  This HTMLPanel holds most of our content.
@@ -359,6 +344,74 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
     }
     
+    /*
+     * Send a request to get a list of users 
+     */
+    private void sendUsersRequest()
+    {
+	RESTility.callREST("api/users", new RESTCallback(){
+		
+            @Override
+	    public void onSuccess(JSONValue val){
+		JSONArray ja;
+		// this is actually where we fill in the userlist grid
+		
+		RootPanel.get("mainContent").add(m_userListPanel);
+
+		m_userListPanel.getElement().setInnerHTML("");
+		String panelHTML = "";
+
+		panelHTML += BEGIN_GRID;
+
+		if (val != null &&   (ja = val.isArray()) != null){
+		    int l = ja.size();
+		    for (int i = 0; i < l; i++){
+			if (i % 2 == 0) {  
+			    panelHTML += BEGIN_GRID_EVEN_ROW;
+			} else {
+			    panelHTML += BEGIN_GRID_ODD_ROW;
+			}
+			JSONValue jv;
+			JSONObject jobj;
+
+			if (((jv = ja.get(i)) != null) &&
+			    ((jobj = jv.isObject()) != null)){
+			    String userid = JSONUtil.getStringValue(jobj, "userid");
+			    if (userid == null) 
+				userid = "";
+			    panelHTML += BEGIN_USERID_COL + userid + END_COL;
+			    String firstname = JSONUtil.getStringValue(jobj, "firstname");
+			    if (firstname == null)
+				firstname = "";
+			    String lastname = JSONUtil.getStringValue(jobj, "lastname");
+			    if (lastname == null)
+				lastname = "";
+			    panelHTML += BEGIN_FULLNAME_COL 
+				+ firstname + " " + lastname + END_COL;
+			}
+			panelHTML += END_ROW;
+		    }
+		    panelHTML += END_GRID;
+		    m_userListPanel.getElement().setInnerHTML(panelHTML);
+		} // end if val != null
+	    } // end onSuccess
+
+            @Override
+            public void onError(int statusCode, String errorResponse)
+            {
+                MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+            }
+            
+            @Override
+            public void onError(RESTException e)
+            {
+                MessageUtil.showError(e.getReason());
+            }
+	
+	    });
+    }// ends SendUsersRequest();
+
+
     /**
      * Show the successful message result of our REST call.
      * 
