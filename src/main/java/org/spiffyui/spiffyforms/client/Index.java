@@ -41,6 +41,7 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
@@ -92,6 +93,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
     private FancyButton m_save;
     private FancyButton m_del;
+    
+    private Timer m_timer;
 
     private List<FormFeedback> m_feedbacks = new ArrayList<FormFeedback>();
     
@@ -542,6 +545,68 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
     }
     
+    private void validateUsername()
+    {
+        if (m_timer != null) {
+            m_timer.cancel();
+        }
+        
+        if (m_userId.getText().length() < 2) {
+            return;
+        }
+        
+        m_timer = new Timer() 
+            {
+                @Override
+                public void run()
+                {
+                    runUserValidation();
+                }
+            };
+        
+        m_timer.schedule(1000);
+    }
+    
+    /**
+     * Call the usernames REST endpoint and verify that this username is available.
+     */
+    private void runUserValidation()
+    {
+        m_userIdFeedback.setStatus(FormFeedback.LOADING);
+        m_userId.setEnabled(false);
+        User.isUsernameInUse(new RESTObjectCallBack<Boolean>() {
+                public void success(Boolean b)
+                {
+                    if (b.booleanValue()) {
+                        m_userIdFeedback.setStatus(FormFeedback.ERROR);
+                        m_userId.setTitle("This username is already in use");
+                        m_save.setEnabled(false);
+                    } else {
+                        m_userIdFeedback.setStatus(FormFeedback.VALID);
+                        m_userId.setTitle("");
+                    }
+                    
+                    m_userId.setEnabled(true);
+                }
+    
+                public void error(String message)
+                {
+                    MessageUtil.showFatalError(message);
+                    m_userIdFeedback.setStatus(FormFeedback.ERROR);
+                    m_save.setEnabled(false);
+                    m_userId.setEnabled(true);
+                }
+    
+                public void error(RESTException e)
+                {
+                    MessageUtil.showFatalError(e.getReason());
+                    m_userIdFeedback.setStatus(FormFeedback.ERROR);
+                    m_userId.setEnabled(true);
+                    m_save.setEnabled(false);
+                }
+            }, m_userId.getText());
+    }
+    
     /**
      * Enable or disable the save button based on the state of the fields.
      */
@@ -579,6 +644,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     {
         if (w == m_userId) {
             validateField(m_userId, 2, m_userIdFeedback, "User name must be more than two characters");
+            validateUsername();
         } else if (w == m_firstName) {
             validateField(m_firstName, 2, m_firstNameFeedback, "First name must be more than two characters");
         } else if (w == m_lastName) {

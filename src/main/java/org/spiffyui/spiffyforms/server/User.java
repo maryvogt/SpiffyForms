@@ -46,7 +46,7 @@ public class User {
     @Context UriInfo uriInfo;
 
     // this Java method finds a particular user in the list of users
-    private JSONObject findUserInArray(String userID){
+    static JSONObject findUserInArray(String userID){
 	JSONArray users = Users.getUserList();
 	if (users == null)
 	    return null;
@@ -74,7 +74,7 @@ public class User {
     }
 
     // this Java method finds a particular user in the list of users
-    private int findUserIndexInArray(String userID){
+    static int findUserIndexInArray(String userID){
 	JSONArray users = Users.getUserList();
 	if (users == null)
 	    return -1;

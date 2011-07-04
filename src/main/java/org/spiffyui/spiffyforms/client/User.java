@@ -251,5 +251,30 @@ class User
 	
 	    });
     }
+    
+    public static void isUsernameInUse(final RESTObjectCallBack<Boolean> callback, String username)
+    {
+        
+        RESTility.callREST("api/usernames/"  + username, new RESTCallback() {
+                @Override
+                public void onSuccess(JSONValue val)
+                {
+                    callback.success(JSONUtil.getBooleanValue(val.isObject(), "exists"));
+                }
+
+                @Override
+                public void onError(int statusCode, String errorResponse)
+                {
+                    MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+                }
+                
+                @Override
+                public void onError(RESTException e)
+                {
+                    MessageUtil.showError(e.getReason());
+                }
+	
+	    });
+    }
 
 }
