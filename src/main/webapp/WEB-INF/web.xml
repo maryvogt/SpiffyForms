@@ -24,11 +24,6 @@
 
   <!-- Servlets -->
   <servlet>
-    <servlet-name>UserServlet</servlet-name>
-    <servlet-class>org.spiffyui.spiffyforms.server.UserServlet</servlet-class>
-  </servlet>
-  
-  <servlet>
     <servlet-name>JSLocaleServlet</servlet-name>
     <servlet-class>org.spiffyui.server.JSLocaleServlet</servlet-class>
   </servlet>
