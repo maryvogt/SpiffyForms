@@ -16,6 +16,7 @@
 package org.spiffyui.spiffyforms.server;
 
 import java.text.DateFormat;
+import java.util.Iterator;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -171,7 +172,7 @@ public class User {
 		JSONObject inputUser = new JSONObject(input);
 		Iterator iter = inputUser.keys();
 		while (iter.hasNext()){
-		    String key = iter.Next();
+		    String key = (String)iter.next();
 		    storedUser.put(key, inputUser.get(key));
 		}
 	    } catch (JSONException je){
@@ -194,7 +195,13 @@ public class User {
 	// we know userID is non-null
 	int i = findUserIndexInArray(userID);
 	if (i != -1){ // -1 means not found
-	    users.remove(i);
+	    JSONArray userList = Users.getUserList();
+	    try {
+		userList.put(i, (Object) null);
+	    } catch (JSONException e) {
+		e.printStackTrace();
+	    }
+	    return "{\"success\":true}";
 	} else {
 	    throw new WebApplicationException(Response.Status.NOT_FOUND);
 	}
