@@ -32,16 +32,14 @@ import com.google.gwt.json.client.JSONValue;
 
 class User
 {
-    private String m_firstName;
-    private String m_lastName;
-    private String m_email;
-    private String m_password;
-    private Date m_bDay;
-    private String m_userDesc;
-    private String m_securityQuestion;
-    private String m_securityAnswer;
-    private String m_userId;
-    private String m_gender;
+    private String m_firstName = "";
+    private String m_lastName = "";
+    private String m_email = "";
+    private String m_password = "";
+    private Date m_bDay = null;
+    private String m_userDesc = "";
+    private String m_userId = "";
+    private String m_gender = "male";
     
     private boolean m_isNew = true;
 
@@ -126,6 +124,11 @@ class User
         m_gender = gender;
     }
     
+    public boolean isNew()
+    {
+        return m_isNew;
+    }
+    
     /*
      * Send a request to get a list of users 
      */
@@ -189,6 +192,7 @@ class User
         user.put("desc", new JSONString(getUserDesc()));
         user.put("gender", new JSONString(getGender()));
         user.put("password", new JSONString(getPassword()));
+        user.put("userID", new JSONString(getUserId()));
         
         RESTility.HTTPMethod m = RESTility.PUT;
         

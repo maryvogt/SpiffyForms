@@ -66,7 +66,7 @@ h2 {
 }
 
 #mainBody {
-    margin-left: 0px;
+    margin-left: 10px;
 }
 
 #userMale {
@@ -80,5 +80,16 @@ button.spiffy-del-button {
 #userListGrid {
     height: 100px;
     overflow: auto;
-    width: 690px;
+    width: 675px;
+    border: thin solid lightgray;
+}
+
+#userListTitle {
+    position: relative;
+}
+
+#newUserLink {
+    position: absolute;
+    right: 10px;
+    top: 0px;
 }

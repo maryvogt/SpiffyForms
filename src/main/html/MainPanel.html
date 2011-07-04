@@ -4,13 +4,18 @@
      src/main/java/org.spiffyui.spiffyforms/client/Index.java.
 -->
 
-<h2 class="sectionTitle">User list</h2>
+<h2 id="userListTitle" class="sectionTitle">Users</h2>
 <div id="userListGrid"></div>
 
 
 <fieldset">
-    <h2 class="sectionTitle">User details</h2>
+    <h2 id="userDetailsTitle" class="sectionTitle">User details</h2>
     <ol class="dialogformsection">
+        <li id="userIdRow" class="dialogformrow">
+            <label class="dialogformlabel" for="userIdTxt">Username:</label>
+            <div id="userId" class="formcontrolssection"></div>
+        </li>
+        
         <li id="firstNameRow" class="dialogformrow">
             <label class="dialogformlabel" for="firstNameTxt">First name:</label>
             <div id="firstName" class="formcontrolssection"></div>

@@ -62,6 +62,9 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
     private static Index g_index;
     private HTMLPanel m_panel;
+    
+    private TextBox m_userId;
+    private FormFeedback m_userIdFeedback;
 
     private TextBox m_firstName;
     private FormFeedback m_firstNameFeedback;
@@ -124,6 +127,19 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         getUsers();
         
         buildFormUI();
+        
+        Anchor newUser = new Anchor("add user", "#");
+        newUser.getElement().setId("newUserLink");
+        newUser.addClickHandler(new ClickHandler()
+            {
+                @Override
+                public void onClick(ClickEvent event)
+                {
+                    showUser(new User());
+                    m_userId.setFocus(true);
+                }
+            });
+        m_panel.add(newUser, "userListTitle");
 
         
     }
@@ -137,6 +153,19 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
          */
         m_panel = new HTMLPanel(STRINGS.MainPanel_html());
         RootPanel.get("mainContent").add(m_panel);
+        
+        /*
+         User ID
+         */
+        m_userId = new TextBox();
+        m_userId.addKeyUpHandler(this);
+        m_userId.getElement().setId("userIdTxt");
+        m_userId.getElement().addClassName(WIDE_TEXT_FIELD);
+        m_panel.add(m_userId, "userId");
+
+        m_userIdFeedback = new FormFeedback();
+        m_feedbacks.add(m_userIdFeedback);
+        m_panel.add(m_userIdFeedback, "userIdRow");
         
         /*
          First name
@@ -366,26 +395,41 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     {
         m_currentUser = user;
         
+        m_userId.setText(user.getUserId());
         m_firstName.setText(user.getFirstName());
         m_lastName.setText(user.getLastName());
         m_email.setText(user.getEmail());
         m_password.setText(user.getPassword());
         m_passwordRepeat.setText(user.getPassword());
-        m_bDay.setDateValue(user.getBirthday());
+        
+        if (user.getBirthday() != null) {
+            m_bDay.setDateValue(user.getBirthday());
+        } else {
+            m_bDay.setText("");
+        }
+        
         m_userDesc.setText(user.getUserDesc());
         
         m_male.setChecked(user.getGender().equals("male"));
         m_female.setChecked(user.getGender().equals("female"));
         
         for (FormFeedback f : m_feedbacks) {
-            if (m_currentUser != null) {
-                f.setStatus(FormFeedback.VALID);
-            } else {
+            if (m_currentUser.isNew()) {
                 f.setStatus(FormFeedback.NONE);
+            } else {
+                f.setStatus(FormFeedback.VALID);
             }
         }
         
         updateFormStatus(null);
+        m_del.setEnabled(!m_currentUser.isNew());
+        m_userId.setEnabled(m_currentUser.isNew());
+        
+        if (m_currentUser.isNew()) {
+            m_panel.getElementById("userDetailsTitle").setInnerText("User Details - New User");
+        } else {
+            m_panel.getElementById("userDetailsTitle").setInnerText("User Details - " + user.getUserId());
+        }
     }
 
     @Override
@@ -411,6 +455,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
         m_save.setInProgress(true);
         
+        m_currentUser.setUserId(m_userId.getText());
         m_currentUser.setFirstName(m_firstName.getText());
         m_currentUser.setLastName(m_lastName.getText());
         m_currentUser.setEmail(m_email.getText());
@@ -532,7 +577,9 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     
     private void updateFormStatus(Widget w)
     {
-        if (w == m_firstName) {
+        if (w == m_userId) {
+            validateField(m_userId, 2, m_userIdFeedback, "User name must be more than two characters");
+        } else if (w == m_firstName) {
             validateField(m_firstName, 2, m_firstNameFeedback, "First name must be more than two characters");
         } else if (w == m_lastName) {
             validateField(m_lastName, 2, m_lastNameFeedback, "Last name must be more than two characters");
