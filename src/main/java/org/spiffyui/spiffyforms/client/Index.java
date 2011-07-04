@@ -16,30 +16,20 @@
 package org.spiffyui.spiffyforms.client;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-import com.google.gwt.json.client.JSONArray;
-import com.google.gwt.json.client.JSONBoolean;
-import com.google.gwt.json.client.JSONNumber;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONString;
-import com.google.gwt.json.client.JSONValue;
-
-
-import org.spiffyui.client.widgets.DatePickerTextBox;
-import org.spiffyui.client.widgets.button.FancyButton;
-import org.spiffyui.client.widgets.button.FancySaveButton;
-import org.spiffyui.client.widgets.FormFeedback;
 import org.spiffyui.client.JSONUtil;
-import org.spiffyui.client.JSUtil;
 import org.spiffyui.client.MainFooter;
 import org.spiffyui.client.MainHeader;
 import org.spiffyui.client.MessageUtil;
 import org.spiffyui.client.rest.RESTCallback;
 import org.spiffyui.client.rest.RESTException;
+import org.spiffyui.client.rest.RESTObjectCallBack;
 import org.spiffyui.client.rest.RESTility;
+import org.spiffyui.client.widgets.DatePickerTextBox;
+import org.spiffyui.client.widgets.FormFeedback;
 import org.spiffyui.client.widgets.LongMessage;
+import org.spiffyui.client.widgets.button.FancyButton;
 
 import com.google.gwt.core.client.EntryPoint;
 import com.google.gwt.core.client.GWT;
@@ -51,12 +41,10 @@ import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.Grid;
+import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.PasswordTextBox;
-import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
@@ -70,16 +58,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
     private static final String WIDE_TEXT_FIELD = "wideTextField";
     private static final SpiffyUiHtml STRINGS = (SpiffyUiHtml) GWT.create(SpiffyUiHtml.class);
-
-    private static final String BEGIN_GRID = "<div class=\"gridlist\">";
-    private static final String BEGIN_GRID_EVEN_ROW = "<div class=\"gridlistitem evenrow\">";
-    private static final String BEGIN_GRID_ODD_ROW  = 
-	"<div class=\"gridlistitem oddrow\">";
-    private static final String BEGIN_USERID_COL  = "<div class=\"useridcol\">";
-    private static final String BEGIN_FULLNAME_COL = "<div class=\"userfullnamecol\">";
-    private static final String END_GRID = "</div>";
-    private static final String END_ROW = "</div>";
-    private static final String END_COL = "</div>";
 
     private static Index g_index;
     private TextBox m_text = new TextBox();
@@ -137,8 +115,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
          */
         MainFooter footer = new MainFooter();
         footer.setFooterString("SpiffyForms was built with the <a href=\"http://www.spiffyui.org\">Spiffy UI Framework</a>");
-	
-	sendUsersRequest();
 
         // /*
         //  This HTMLPanel holds most of our content.
@@ -158,7 +134,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         //     }
         // };
         
-	// // where does "mainContent" get set into the RootPanel? MV
+    // // where does "mainContent" get set into the RootPanel? MV
         // RootPanel.get("mainContent").add(panel);
         
         // /*
@@ -290,8 +266,67 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
         // panel.add(m_save, "page2Buttons");
         // //updateFormStatus(null);
+         
+        RootPanel.get("mainContent").add(m_userListPanel);
+        
+        getUsers();
 
         
+    }
+    
+    private void getUsers()
+    {
+        User.getUsers(new RESTObjectCallBack<User[]>() {
+                public void success(User[] users)
+                {
+                    showUsers(users);
+                }
+    
+                public void error(String message)
+                {
+                    MessageUtil.showFatalError(message);
+                }
+    
+                public void error(RESTException e)
+                {
+                    MessageUtil.showFatalError(e.getReason());
+                }
+            });
+    }
+    
+    private void showUsers(User users[])
+    {
+        StringBuffer userHTML = new StringBuffer();
+        
+        userHTML.append("<div class=\"gridlist\">");
+        
+        for (int i = 0; i < users.length; i++) {
+            User u = users[i];
+            if (i % 2 == 0) {
+                userHTML.append("<div class=\"gridlistitem evenrow\">");
+            } else {
+                userHTML.append("<div class=\"gridlistitem oddrow\">");
+            }
+            
+            /*
+             The user id
+             */
+            userHTML.append("<div class=\"useridcol\">" + u.getUserId() + "</div>");
+            
+            /*
+             The user's name
+             */
+            userHTML.append("<div class=\"userfullnamecol\">" + u.getFirstName() + " " + u.getLastName() + "</div>");
+            
+            /*
+             The email address
+             */
+            userHTML.append("<div class=\"useremailcol\">" + u.getEmail() + "</div>");
+            
+            userHTML.append("</div");
+        }
+        
+        m_userListPanel.getElement().setInnerHTML(userHTML.toString());
     }
     
     @Override
@@ -344,74 +379,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
     }
     
-    /*
-     * Send a request to get a list of users 
-     */
-    private void sendUsersRequest()
-    {
-	RESTility.callREST("api/users", new RESTCallback(){
-		
-            @Override
-	    public void onSuccess(JSONValue val){
-		JSONArray ja;
-		// this is actually where we fill in the userlist grid
-		
-		RootPanel.get("mainContent").add(m_userListPanel);
-
-		m_userListPanel.getElement().setInnerHTML("");
-		String panelHTML = "";
-
-		panelHTML += BEGIN_GRID;
-
-		if (val != null &&   (ja = val.isArray()) != null){
-		    int l = ja.size();
-		    for (int i = 0; i < l; i++){
-			if (i % 2 == 0) {  
-			    panelHTML += BEGIN_GRID_EVEN_ROW;
-			} else {
-			    panelHTML += BEGIN_GRID_ODD_ROW;
-			}
-			JSONValue jv;
-			JSONObject jobj;
-
-			if (((jv = ja.get(i)) != null) &&
-			    ((jobj = jv.isObject()) != null)){
-			    String userid = JSONUtil.getStringValue(jobj, "userid");
-			    if (userid == null) 
-				userid = "";
-			    panelHTML += BEGIN_USERID_COL + userid + END_COL;
-			    String firstname = JSONUtil.getStringValue(jobj, "firstname");
-			    if (firstname == null)
-				firstname = "";
-			    String lastname = JSONUtil.getStringValue(jobj, "lastname");
-			    if (lastname == null)
-				lastname = "";
-			    panelHTML += BEGIN_FULLNAME_COL 
-				+ firstname + " " + lastname + END_COL;
-			}
-			panelHTML += END_ROW;
-		    }
-		    panelHTML += END_GRID;
-		    m_userListPanel.getElement().setInnerHTML(panelHTML);
-		} // end if val != null
-	    } // end onSuccess
-
-            @Override
-            public void onError(int statusCode, String errorResponse)
-            {
-                MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
-            }
-            
-            @Override
-            public void onError(RESTException e)
-            {
-                MessageUtil.showError(e.getReason());
-            }
-	
-	    });
-    }// ends SendUsersRequest();
-
-
     /**
      * Show the successful message result of our REST call.
      * 
