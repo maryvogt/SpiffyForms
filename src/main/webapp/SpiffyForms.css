@@ -28,3 +28,37 @@ li {
 .spiffy-longmessage-panel {
     margin-bottom: 1em;
 }
+
+.gridlist {
+    font-size: 1.5em;
+    background-color: #00FF00;
+}
+
+.oddrow {
+    background-color: #F2F2F2;
+}
+
+
+.gridlistitem {
+    height: 2.5em;
+    margin: 0.5em;
+    position: relative;
+    vertical-align: top;
+}
+
+.useridcol {
+    font-size: 0.75em;
+    left: 0.25em;
+    line-height: 1.5em;
+    position: absolute;
+    top: 0;
+    width: 20%;
+}
+
+.userfullnamecol {
+    left: 5em;
+    line-height: 1.5em;
+    position: absolute;
+    top: 0;
+    width: 80%;
+}

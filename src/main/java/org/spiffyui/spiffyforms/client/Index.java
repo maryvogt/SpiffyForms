@@ -45,6 +45,7 @@ import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONValue;
 import com.google.gwt.user.client.ui.Button;
+import com.google.gwt.user.client.ui.Grid;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
@@ -62,9 +63,21 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private static final String WIDE_TEXT_FIELD = "wideTextField";
     private static final SpiffyUiHtml STRINGS = (SpiffyUiHtml) GWT.create(SpiffyUiHtml.class);
 
+    private static final String BEGIN_GRID = "<div class=\"gridlist\">";
+    private static final String BEGIN_GRID_EVEN_ROW = "<div class=\"gridlistitem evenrow\">";
+    private static final String BEGIN_GRID_ODD_ROW  = 
+	"<div class=\"gridlistitem oddrow\">";
+    private static final String BEGIN_USERID_COL  = "<div class=\"useridcol\">";
+    private static final String BEGIN_FULLNAME_COL = "<div class=\"userfullnamecol\">";
+    private static final String END_GRID = "</div>";
+    private static final String END_ROW = "</div>";
+    private static final String END_COL = "</div>";
+
     private static Index g_index;
     private TextBox m_text = new TextBox();
     private LongMessage m_longMessage = new LongMessage("longMsgPanel");   
+
+    //    private Grid m_userListGrid;
 
     private TextBox m_firstName;
     private FormFeedback m_firstNameFeedback;
@@ -115,156 +128,183 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
          */
         MainFooter footer = new MainFooter();
         footer.setFooterString("SpiffyForms was built with the <a href=\"http://www.spiffyui.org\">Spiffy UI Framework</a>");
+	
+	/*
+	  This HTMLPanel holds the list of users
+	  UserListPanel_html was built from UserListPanel.html by the
+	  HTMLProps task, which allows you to use large passages
+	  of HTML without having to string escape them.
+	*/
+	HTMLPanel userListPanel = new HTMLPanel(STRINGS.UserListPanel_html());
+	RootPanel.get("mainContent").add(userListPanel);
+
+	String panelHTML = userListPanel.getElement().getInnerHTML();
+	
+	panelHTML += BEGIN_GRID;
+	for (int r = 0; r < 9; r++){
+	    if (r%2 == 0){ //even
+		panelHTML += BEGIN_GRID_EVEN_ROW;
+	    } else { //odd
+		panelHTML += BEGIN_GRID_ODD_ROW;
+	    }
+	    panelHTML += BEGIN_USERID_COL + "userID" + r + END_COL;
+	    panelHTML += BEGIN_FULLNAME_COL + "fullName" + r + END_COL;
+	    panelHTML += END_ROW;
+	}
+	panelHTML += END_GRID;
+
+	userListPanel.getElement().setInnerHTML(panelHTML);
+
+        // /*
+        //  This HTMLPanel holds most of our content.
+        //  MainPanel_html was built in the HTMLProps task from MainPanel.html, which allows you to use large passages of html
+        //  without having to string escape them.
+        //  */
+        // HTMLPanel panel = new HTMLPanel(STRINGS.MainPanel_html())
+        // {
+        //     @Override
+        //     public void onLoad()
+        //     {
+        //         super.onLoad();
+        //         /*
+        //          Let's set focus into the text field when the page first loads
+        //          */
+        //         m_text.setFocus(true);
+        //     }
+        // };
         
-        /*
-         This HTMLPanel holds most of our content.
-         MainPanel_html was built in the HTMLProps task from MainPanel.html, which allows you to use large passages of html
-         without having to string escape them.
-         */
-        HTMLPanel panel = new HTMLPanel(STRINGS.MainPanel_html())
-        {
-            @Override
-            public void onLoad()
-            {
-                super.onLoad();
-                /*
-                 Let's set focus into the text field when the page first loads
-                 */
-                m_text.setFocus(true);
-            }
-        };
+	// // where does "mainContent" get set into the RootPanel? MV
+        // RootPanel.get("mainContent").add(panel);
         
-        RootPanel.get("mainContent").add(panel);
+        // /*
+        //  These dynamic controls add interactivity to our page.
+        //  */
+        // panel.add(m_longMessage, "longMsg");
+        // panel.add(m_text, "nameField");
+        // final Button button = new Button("Submit");
+        // panel.add(button, "submitButton");
         
-        /*
-         These dynamic controls add interactivity to our page.
-         */
-        panel.add(m_longMessage, "longMsg");
-        panel.add(m_text, "nameField");
-        final Button button = new Button("Submit");
-        panel.add(button, "submitButton");
-        
-        button.addClickHandler(this);
-        m_text.addKeyPressHandler(this);
+        // button.addClickHandler(this);
+        // m_text.addKeyPressHandler(this);
 
         
-        /*
-         First name
-         */
-        m_firstName = new TextBox();
-        m_firstName.addKeyUpHandler(this);
-        m_firstName.getElement().setId("firstNameTxt");
-        m_firstName.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_firstName, "firstName");
+        // /*
+        //  First name
+        //  */
+        // m_firstName = new TextBox();
+        // m_firstName.addKeyUpHandler(this);
+        // m_firstName.getElement().setId("firstNameTxt");
+        // m_firstName.getElement().addClassName(WIDE_TEXT_FIELD);
+        // panel.add(m_firstName, "firstName");
 
-        m_firstNameFeedback = new FormFeedback();
-        m_feedbacks.add(m_firstNameFeedback);
-        panel.add(m_firstNameFeedback, "firstNameRow");
+        // m_firstNameFeedback = new FormFeedback();
+        // m_feedbacks.add(m_firstNameFeedback);
+        // panel.add(m_firstNameFeedback, "firstNameRow");
 
-        /*
-         Last name
-         */
-        m_lastName = new TextBox();
-        m_lastName.addKeyUpHandler(this);
-        m_lastName.getElement().setId("lastNameTxt");
-        m_lastName.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_lastName, "lastName");
+        // /*
+        //  Last name
+        //  */
+        // m_lastName = new TextBox();
+        // m_lastName.addKeyUpHandler(this);
+        // m_lastName.getElement().setId("lastNameTxt");
+        // m_lastName.getElement().addClassName(WIDE_TEXT_FIELD);
+        // panel.add(m_lastName, "lastName");
 
-        m_lastNameFeedback = new FormFeedback();
-        m_feedbacks.add(m_lastNameFeedback);
-        panel.add(m_lastNameFeedback, "lastNameRow");
+        // m_lastNameFeedback = new FormFeedback();
+        // m_feedbacks.add(m_lastNameFeedback);
+        // panel.add(m_lastNameFeedback, "lastNameRow");
 
-        /*
-         email
-         */
-        m_email = new TextBox();
-        m_email.addKeyUpHandler(this);
-        m_email.getElement().setId("emailTxt");
-        m_email.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_email, "email");
+        // /*
+        //  email
+        //  */
+        // m_email = new TextBox();
+        // m_email.addKeyUpHandler(this);
+        // m_email.getElement().setId("emailTxt");
+        // m_email.getElement().addClassName(WIDE_TEXT_FIELD);
+        // panel.add(m_email, "email");
 
-        m_emailFeedback = new FormFeedback();
-        m_feedbacks.add(m_emailFeedback);
-        panel.add(m_emailFeedback, "emailRow");
+        // m_emailFeedback = new FormFeedback();
+        // m_feedbacks.add(m_emailFeedback);
+        // panel.add(m_emailFeedback, "emailRow");
 
-        /*
-         User's birthdate
-         */
-        m_bDay = new DatePickerTextBox("userBdayTxt");
-        m_bDay.setMaximumDate(new Date()); //user cannot be born tomorrow
-        m_bDay.addKeyUpHandler(this);
-        m_bDay.getElement().addClassName("slimTextField");
-        panel.add(m_bDay, "userBday");
+        // /*
+        //  User's birthdate
+        //  */
+        // m_bDay = new DatePickerTextBox("userBdayTxt");
+        // m_bDay.setMaximumDate(new Date()); //user cannot be born tomorrow
+        // m_bDay.addKeyUpHandler(this);
+        // m_bDay.getElement().addClassName("slimTextField");
+        // panel.add(m_bDay, "userBday");
 
-        m_bDayFeedback = new FormFeedback();
-        panel.add(m_bDayFeedback, "userBdayRow");
+        // m_bDayFeedback = new FormFeedback();
+        // panel.add(m_bDayFeedback, "userBdayRow");
 
-        /*
-         User's gender
-         */
-        RadioButton female = new RadioButton("userGender", "Female");
-        panel.add(female, "userGender");
+        // /*
+        //  User's gender
+        //  */
+        // RadioButton female = new RadioButton("userGender", "Female");
+        // panel.add(female, "userGender");
 
-        RadioButton male = new RadioButton("userGender", "Male");
-        male.addStyleName("radioOption");
-        male.setValue(true);
-        male.getElement().setId("userMale");
-        panel.add(male, "userGender");
+        // RadioButton male = new RadioButton("userGender", "Male");
+        // male.addStyleName("radioOption");
+        // male.setValue(true);
+        // male.getElement().setId("userMale");
+        // panel.add(male, "userGender");
 
-        /*
-         User description
-         */
-        m_userDesc = new TextArea();
-        m_userDesc.addKeyUpHandler(this);
-        m_userDesc.getElement().setId("userDescTxt");
-        m_userDesc.getElement().addClassName(WIDE_TEXT_FIELD);
-        panel.add(m_userDesc, "userDesc");
+        // /*
+        //  User description
+        //  */
+        // m_userDesc = new TextArea();
+        // m_userDesc.addKeyUpHandler(this);
+        // m_userDesc.getElement().setId("userDescTxt");
+        // m_userDesc.getElement().addClassName(WIDE_TEXT_FIELD);
+        // panel.add(m_userDesc, "userDesc");
 
-        m_userDescFeedback = new FormFeedback();
-        m_feedbacks.add(m_userDescFeedback);
-        panel.add(m_userDescFeedback, "userDescRow");
+        // m_userDescFeedback = new FormFeedback();
+        // m_feedbacks.add(m_userDescFeedback);
+        // panel.add(m_userDescFeedback, "userDescRow");
 
-        /*
-         Password
-         */
-        m_password = new PasswordTextBox();
-        m_password.addKeyUpHandler(this);
-        m_password.getElement().setId("passwordTxt");
-        m_password.getElement().addClassName("slimTextField");
-        panel.add(m_password, "password");
+        // /*
+        //  Password
+        //  */
+        // m_password = new PasswordTextBox();
+        // m_password.addKeyUpHandler(this);
+        // m_password.getElement().setId("passwordTxt");
+        // m_password.getElement().addClassName("slimTextField");
+        // panel.add(m_password, "password");
 
-        m_passwordFeedback = new FormFeedback();
-        m_feedbacks.add(m_passwordFeedback);
-        panel.add(m_passwordFeedback, "passwordRow");
+        // m_passwordFeedback = new FormFeedback();
+        // m_feedbacks.add(m_passwordFeedback);
+        // panel.add(m_passwordFeedback, "passwordRow");
 
-        /*
-         Password repeat
-         */
-        m_passwordRepeat = new PasswordTextBox();
-        m_passwordRepeat.addKeyUpHandler(this);
-        m_passwordRepeat.getElement().setId("passwordRepeatTxt");
-        m_passwordRepeat.getElement().addClassName("slimTextField");
-        panel.add(m_passwordRepeat, "passwordRepeat");
+        // /*
+        //  Password repeat
+        //  */
+        // m_passwordRepeat = new PasswordTextBox();
+        // m_passwordRepeat.addKeyUpHandler(this);
+        // m_passwordRepeat.getElement().setId("passwordRepeatTxt");
+        // m_passwordRepeat.getElement().addClassName("slimTextField");
+        // panel.add(m_passwordRepeat, "passwordRepeat");
 
-        m_passwordRepeatFeedback = new FormFeedback();
-        m_feedbacks.add(m_passwordRepeatFeedback);
-        panel.add(m_passwordRepeatFeedback, "passwordRepeatRow");
+        // m_passwordRepeatFeedback = new FormFeedback();
+        // m_feedbacks.add(m_passwordRepeatFeedback);
+        // panel.add(m_passwordRepeatFeedback, "passwordRepeatRow");
 
 
 
-        /*
-         The big save button
-         */
-        m_save = new FancySaveButton("Save");
-        m_save.addClickHandler(new ClickHandler() {
-                public void onClick(ClickEvent event)
-                {
-                   // save();
-                }
-            });
+        // /*
+        //  The big save button
+        //  */
+        // m_save = new FancySaveButton("Save");
+        // m_save.addClickHandler(new ClickHandler() {
+        //         public void onClick(ClickEvent event)
+        //         {
+        //            // save();
+        //         }
+        //     });
 
-        panel.add(m_save, "page2Buttons");
-        //updateFormStatus(null);
+        // panel.add(m_save, "page2Buttons");
+        // //updateFormStatus(null);
 
         
     }
