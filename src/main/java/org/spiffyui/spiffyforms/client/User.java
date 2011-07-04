@@ -26,6 +26,8 @@ import org.spiffyui.client.rest.RESTObjectCallBack;
 import org.spiffyui.client.rest.RESTility;
 
 import com.google.gwt.json.client.JSONArray;
+import com.google.gwt.json.client.JSONObject;
+import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
 class User
@@ -39,6 +41,8 @@ class User
     private String m_securityQuestion;
     private String m_securityAnswer;
     private String m_userId;
+    
+    private boolean m_isNew = true;
 
     public String getFirstName()
     {
@@ -129,9 +133,9 @@ class User
                         u.setFirstName(JSONUtil.getStringValue(usersArray.get(i).isObject(), "firstName"));
                         u.setLastName(JSONUtil.getStringValue(usersArray.get(i).isObject(), "lastName"));
                         u.setPassword(JSONUtil.getStringValue(usersArray.get(i).isObject(), "password"));
-                        u.setLastName(JSONUtil.getStringValue(usersArray.get(i).isObject(), "lastName"));
                         u.setUserId(JSONUtil.getStringValue(usersArray.get(i).isObject(), "userID"));
                         u.setEmail(JSONUtil.getStringValue(usersArray.get(i).isObject(), "email"));
+                        u.m_isNew = false;
                         
                         users.add(u);
                     }
@@ -153,6 +157,75 @@ class User
                 }
 	
 	    });
-    }// ends SendUsersRequest();
+    }
+    
+    public void save(final RESTObjectCallBack<Boolean> callback)
+    {
+        
+        JSONObject user = new JSONObject();
+        
+        user.put("firstName", new JSONString(getFirstName()));
+        user.put("lastName", new JSONString(getLastName()));
+        user.put("email", new JSONString(getEmail()));
+        user.put("userID", new JSONString(getUserId()));
+        user.put("password", new JSONString(getPassword()));
+        
+        RESTility.HTTPMethod m = RESTility.PUT;
+        
+        if (m_isNew) {
+            /*
+             If this user has never been saved then we need
+             to use a POST instead of a PUT
+             */
+            m = RESTility.POST;
+        }
+        
+        RESTility.callREST("api/users", user.toString(), m, new RESTCallback() {
+                @Override
+                public void onSuccess(JSONValue val)
+                {
+                    m_isNew = false;
+                    callback.success(Boolean.TRUE);
+                }
+
+                @Override
+                public void onError(int statusCode, String errorResponse)
+                {
+                    MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+                }
+                
+                @Override
+                public void onError(RESTException e)
+                {
+                    MessageUtil.showError(e.getReason());
+                }
+	
+	    });
+    }
+    
+    public void delete(final RESTObjectCallBack<Boolean> callback)
+    {
+        
+        RESTility.callREST("api/users", null, RESTility.DELETE, new RESTCallback() {
+                @Override
+                public void onSuccess(JSONValue val)
+                {
+                    callback.success(Boolean.TRUE);
+                }
+
+                @Override
+                public void onError(int statusCode, String errorResponse)
+                {
+                    MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+                }
+                
+                @Override
+                public void onError(RESTException e)
+                {
+                    MessageUtil.showError(e.getReason());
+                }
+	
+	    });
+    }
 
 }

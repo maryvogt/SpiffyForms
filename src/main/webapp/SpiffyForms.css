@@ -21,16 +21,8 @@ h2 {
     margin-top: 1.5em;
 }
 
-li {
-    list-style: disc inside none;
-}
-
 .spiffy-longmessage-panel {
     margin-bottom: 1em;
-}
-
-.gridlist {
-    font-size: 1.5em;
 }
 
 .oddrow {
