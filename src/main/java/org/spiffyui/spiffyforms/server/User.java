@@ -43,6 +43,34 @@ public class User {
 
     @Context UriInfo uriInfo;
 
+    // this Java method finds a particular user in the list of users
+    private JSONObject findUserInArray(String userID){
+	JSONArray users = Users.getUserList();
+	if (users == null)
+	    return null;
+
+	JSONObject user = null;
+	int len = users.length();
+	try {
+	    for (int i=0; i<len; i++) {
+		user = users.getJSONObject(i);
+
+		if (user != null){
+		    String id = user.getString("userID");
+		    if (userID.equals(id)){
+			// found it!
+			return user;
+		    }
+		}
+	    }
+	} catch (JSONException je){
+	    // not going to happen in this demo app
+	}
+		    
+	// if we got here then we didn't find it
+	return null;
+    }
+
     // The Java method will process HTTP GET requests
     @GET 
     // The Java method will produce content identified by the MIME Media
@@ -57,48 +85,44 @@ public class User {
 	if (userid == null){
 	    throw new WebApplicationException(400);
 	}
-	    
-	JSONArray users = Users.getUserList();
-	if (users == null)
-	    return null;
 
-
-	JSONObject user = null;
-
-
-	int len = users.length();
-	try {
-	    for (int i=0; i<len; i++) {
-		user = users.getJSONObject(i);
-
-		if (user != null){
-		    String id = user.getString("userID");
-		    if (userid.equals(id)){
-			// found it!
-			return user.toString();
-		    }
-		}
-	    }
-	} catch (JSONException je){
-	    // not going to happen in this demo app
+	JSONObject user = findUserInArray(userid);
+	if (user == null) {
+	    throw new WebApplicationException(Response.Status.NOT_FOUND);
 	}
-		    
-	// if we got here then we didn't find it
-	throw new WebApplicationException(Response.Status.NOT_FOUND);
+	
+	return user.toString();
     }
 
 
     @POST 
     // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
-    @Produces("text/plain")
-    // This method attempts to create new user info based on the info in the input string
+    // type "application/JSON"
+    @Produces("application/JSON")
+    // This method attempts to create new user info based on the info 
+    // in the input string
     public String createUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
-        String arg1 = params.getFirst("arg1");
+        String userID = params.getFirst("arg1");
+	// we know that userID is not null because of the Path annotation 
 
-        // Return some cliched textual content
-        return "You're creating " + arg1 + "with data: " + input;
+	// do we already have this user? 
+	if (findUserInArray(userID) != null){
+	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+	}
+
+	try {
+	    JSONArray userList = Users.getUserList();
+	    if (userList != null){
+		userList.put(new JSONObject(input));
+	    }		    
+	} catch (JSONException je){
+	    // input string was probably not correctly formatted JSON.
+	    // we could perhaps be more informative here.
+	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
+	}
+
+	return "{\"result\" : \"success\"}";
     }
 
     @PUT 

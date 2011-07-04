@@ -50,7 +50,7 @@ public class Users {
 	    //	    demoUser.put("birthday", 
 	    //		    DateFormat.getDateInstance().parse("02/22/78"));
 
-	    USER_LIST.put(0, demoUser);
+	    USER_LIST.put(demoUser);
 
 	    demoUser = new JSONObject();
 	    demoUser.put("userID", "bbrown");
@@ -60,7 +60,7 @@ public class Users {
 	    demoUser.put("password", "b0bpass");
 	    //	    demoUser.put("birthday", 
 	    // DateFormat.getDateInstance().parse("12/11/90"));
-	    USER_LIST.put(1, demoUser);
+	    USER_LIST.put(demoUser);
 
 	}
 	catch (JSONException je)
