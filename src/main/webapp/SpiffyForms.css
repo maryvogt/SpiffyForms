@@ -93,3 +93,7 @@ button.spiffy-del-button {
     right: 10px;
     top: 0px;
 }
+
+#userDetailsTitle {
+    margin-top: 2em;
+}

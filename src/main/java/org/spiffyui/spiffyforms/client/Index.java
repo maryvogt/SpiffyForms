@@ -138,6 +138,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
                 @Override
                 public void onClick(ClickEvent event)
                 {
+                    event.preventDefault();
                     showUser(new User());
                     m_userId.setFocus(true);
                 }
@@ -177,6 +178,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_firstName.addKeyUpHandler(this);
         m_firstName.getElement().setId("firstNameTxt");
         m_firstName.getElement().addClassName(WIDE_TEXT_FIELD);
+        m_firstName.getElement().setAttribute("autofocus", "true");
         m_panel.add(m_firstName, "firstName");
 
         m_firstNameFeedback = new FormFeedback();
@@ -240,6 +242,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_userDesc.addKeyUpHandler(this);
         m_userDesc.getElement().setId("userDescTxt");
         m_userDesc.getElement().addClassName(WIDE_TEXT_FIELD);
+        m_userDesc.getElement().setAttribute("placeholder", "Tell us a little about yourself.");
         m_panel.add(m_userDesc, "userDesc");
 
         m_userDescFeedback = new FormFeedback();
@@ -554,6 +557,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         if (m_userId.getText().length() < 2) {
             return;
         }
+        
+        m_userIdFeedback.setStatus(FormFeedback.LOADING);
         
         m_timer = new Timer() 
             {
