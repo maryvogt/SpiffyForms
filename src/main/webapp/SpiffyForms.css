@@ -68,3 +68,11 @@ h2 {
 #mainBody {
     margin-left: 0px;
 }
+
+#userMale {
+    margin-left: 1.5em;
+}
+
+button.spiffy-del-button {
+    background: url("org.spiffyui.spiffyforms.index/images/spiffy_ui_images.png") no-repeat scroll 10px -5px #EDEEEC;
+}

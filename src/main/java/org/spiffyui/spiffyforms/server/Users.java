@@ -47,8 +47,9 @@ public class Users {
 	    demoUser.put("lastName", "Addams");
 	    demoUser.put("email", "aadams@amazon.com");
 	    demoUser.put("password", "aaa");
-	    //	    demoUser.put("birthday", 
-	    //		    DateFormat.getDateInstance().parse("02/22/78"));
+	    demoUser.put("birthday", "-11995200000");
+	    demoUser.put("gender", "female");
+	    demoUser.put("desc", "Alice Addams is just some girl");
 
 	    USER_LIST.put(demoUser);
 
@@ -58,8 +59,9 @@ public class Users {
 	    demoUser.put("lastName", "Brown");
 	    demoUser.put("email", "bbrown@bn.com");
 	    demoUser.put("password", "b0bpass");
-	    //	    demoUser.put("birthday", 
-	    // DateFormat.getDateInstance().parse("12/11/90"));
+	    demoUser.put("birthday", "269582400000");
+	    demoUser.put("gender", "male");
+	    demoUser.put("desc", "Bob Brown is just some guy");
 	    USER_LIST.put(demoUser);
 
 	}

@@ -41,6 +41,7 @@ class User
     private String m_securityQuestion;
     private String m_securityAnswer;
     private String m_userId;
+    private String m_gender;
     
     private boolean m_isNew = true;
 
@@ -100,7 +101,7 @@ class User
         return m_bDay;
     }
 
-    public void setDate(Date d)
+    public void setBirthday(Date d)
     {
         m_bDay = d;
     }
@@ -113,6 +114,16 @@ class User
     public void setUserId(String id)
     {
         m_userId = id;
+    }
+    
+    public String getGender()
+    {
+        return m_gender;
+    }
+
+    public void setGender(String gender)
+    {
+        m_gender = gender;
     }
     
     /*
@@ -128,6 +139,10 @@ class User
                     ArrayList<User> users = new ArrayList<User>();
                     
                     for (int i = 0; i < usersArray.size(); i++) {
+                        if (usersArray.get(i).isNull()) {
+                            continue;
+                        }
+                        
                         User u = new User();
                         
                         u.setFirstName(JSONUtil.getStringValue(usersArray.get(i).isObject(), "firstName"));
@@ -135,6 +150,9 @@ class User
                         u.setPassword(JSONUtil.getStringValue(usersArray.get(i).isObject(), "password"));
                         u.setUserId(JSONUtil.getStringValue(usersArray.get(i).isObject(), "userID"));
                         u.setEmail(JSONUtil.getStringValue(usersArray.get(i).isObject(), "email"));
+                        u.setUserDesc(JSONUtil.getStringValue(usersArray.get(i).isObject(), "desc"));
+                        u.setGender(JSONUtil.getStringValue(usersArray.get(i).isObject(), "gender"));
+                        u.setBirthday(JSONUtil.getDateValue(usersArray.get(i).isObject(), "birthday"));
                         u.m_isNew = false;
                         
                         users.add(u);
@@ -167,7 +185,9 @@ class User
         user.put("firstName", new JSONString(getFirstName()));
         user.put("lastName", new JSONString(getLastName()));
         user.put("email", new JSONString(getEmail()));
-        user.put("userID", new JSONString(getUserId()));
+        user.put("birthday", new JSONString("" + getBirthday().getTime()));
+        user.put("desc", new JSONString(getUserDesc()));
+        user.put("gender", new JSONString(getGender()));
         user.put("password", new JSONString(getPassword()));
         
         RESTility.HTTPMethod m = RESTility.PUT;
@@ -180,7 +200,7 @@ class User
             m = RESTility.POST;
         }
         
-        RESTility.callREST("api/users", user.toString(), m, new RESTCallback() {
+        RESTility.callREST("api/users/" + getUserId(), user.toString(), m, new RESTCallback() {
                 @Override
                 public void onSuccess(JSONValue val)
                 {
@@ -206,7 +226,7 @@ class User
     public void delete(final RESTObjectCallBack<Boolean> callback)
     {
         
-        RESTility.callREST("api/users", null, RESTility.DELETE, new RESTCallback() {
+        RESTility.callREST("api/users/"  + getUserId(), null, RESTility.DELETE, new RESTCallback() {
                 @Override
                 public void onSuccess(JSONValue val)
                 {

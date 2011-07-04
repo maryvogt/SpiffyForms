@@ -77,15 +77,21 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
     private DatePickerTextBox m_bDay;
     private FormFeedback m_bDayFeedback;
+    
+    private RadioButton m_male;
+    private RadioButton m_female;
 
     private TextArea m_userDesc;
     private FormFeedback m_userDescFeedback;
 
     private FancyButton m_save;
+    private FancyButton m_del;
 
     private List<FormFeedback> m_feedbacks = new ArrayList<FormFeedback>();
     
     private Map<String, Anchor> m_anchors = new HashMap<String, Anchor>();
+    
+    private User m_currentUser;
 
     /**
      * The Index page constructor
@@ -183,14 +189,14 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         /*
          User's gender
          */
-        RadioButton female = new RadioButton("userGender", "Female");
-        m_panel.add(female, "userGender");
+        m_female = new RadioButton("userGender", "Female");
+        m_panel.add(m_female, "userGender");
 
-        RadioButton male = new RadioButton("userGender", "Male");
-        male.addStyleName("radioOption");
-        male.setValue(true);
-        male.getElement().setId("userMale");
-        m_panel.add(male, "userGender");
+        m_male = new RadioButton("userGender", "Male");
+        m_male.addStyleName("radioOption");
+        m_male.setValue(true);
+        m_male.getElement().setId("userMale");
+        m_panel.add(m_male, "userGender");
 
         /*
          User description
@@ -240,11 +246,25 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_save.addClickHandler(new ClickHandler() {
                 public void onClick(ClickEvent event)
                 {
-                   // save();
+                   save();
                 }
             });
 
         m_panel.add(m_save, "buttons");
+        
+        /*
+         The delete button
+         */
+        m_del = new DeleteButton("Delete");
+        m_del.addClickHandler(new ClickHandler() {
+                public void onClick(ClickEvent event)
+                {
+                   delete();
+                }
+            });
+
+        m_panel.add(m_del, "buttons");
+        
         //updateFormStatus(null);
     }
     
@@ -270,6 +290,17 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     
     private void showUsers(User users[])
     {
+        if (m_currentUser != null) {
+            showUser(m_currentUser);
+        } else if (users.length > 0) {
+            showUser(users[0]);
+        }
+        
+        for (String id : m_anchors.keySet()) {
+            m_anchors.get(id).removeFromParent();
+        }
+        m_anchors.clear();
+        
         StringBuffer userHTML = new StringBuffer();
         
         userHTML.append("<div class=\"gridlist\">");
@@ -330,7 +361,18 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     
     private void showUser(User user)
     {
+        m_currentUser = user;
+        
         m_firstName.setText(user.getFirstName());
+        m_lastName.setText(user.getLastName());
+        m_email.setText(user.getEmail());
+        m_password.setText(user.getPassword());
+        m_passwordRepeat.setText(user.getPassword());
+        m_bDay.setDateValue(user.getBirthday());
+        m_userDesc.setText(user.getUserDesc());
+        
+        m_male.setChecked(user.getGender().equals("male"));
+        m_female.setChecked(user.getGender().equals("female"));
     }
 
     @Override
@@ -346,6 +388,80 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             // updateFormStatus((Widget) event.getSource());
         }
     }
-
+    
+    private void save()
+    {
+        if (m_currentUser == null) {
+            MessageUtil.showWarning("No user selected to save.", false);
+            return;
+        }
+        
+        m_currentUser.setFirstName(m_firstName.getText());
+        m_currentUser.setLastName(m_lastName.getText());
+        m_currentUser.setEmail(m_email.getText());
+        m_currentUser.setPassword(m_password.getText());
+        m_currentUser.setBirthday(m_bDay.getDateValue());
+        m_currentUser.setUserDesc(m_userDesc.getText());
+        
+        if (m_male.isChecked()) {
+            m_currentUser.setGender("male");
+        } else {
+            m_currentUser.setGender("female");
+        }
+        
+        m_currentUser.save(new RESTObjectCallBack<Boolean>() {
+                public void success(Boolean b)
+                {
+                    MessageUtil.showMessage("The user was saved successfully");
+                    getUsers();
+                }
+    
+                public void error(String message)
+                {
+                    MessageUtil.showFatalError(message);
+                }
+    
+                public void error(RESTException e)
+                {
+                    MessageUtil.showFatalError(e.getReason());
+                }
+            });
+    }
+    
+    private void delete()
+    {
+        if (m_currentUser == null) {
+            MessageUtil.showWarning("No user selected to delete.", false);
+            return;
+        }
+        
+        m_currentUser.delete(new RESTObjectCallBack<Boolean>() {
+                public void success(Boolean b)
+                {
+                    MessageUtil.showMessage("The user was deleted");
+                    getUsers();
+                }
+    
+                public void error(String message)
+                {
+                    MessageUtil.showFatalError(message);
+                }
+    
+                public void error(RESTException e)
+                {
+                    MessageUtil.showFatalError(e.getReason());
+                }
+            });
+    }
 }
 
+
+class DeleteButton extends FancyButton
+{
+    public DeleteButton(String s)
+    {
+        super(s);
+        getElement().setClassName("spiffy-del-button");
+        getElement().addClassName("spiffy-fancy-button");
+    }
+}
