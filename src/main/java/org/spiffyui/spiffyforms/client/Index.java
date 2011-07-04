@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.spiffyui.client.JSUtil;
 import org.spiffyui.client.MainFooter;
 import org.spiffyui.client.MainHeader;
 import org.spiffyui.client.MessageUtil;
@@ -47,6 +48,8 @@ import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
+import com.google.gwt.user.client.ui.TextBoxBase;
+import com.google.gwt.user.client.ui.Widget;
 
 /**
  * This class is the main entry point for our GWT module.
@@ -265,7 +268,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
         m_panel.add(m_del, "buttons");
         
-        //updateFormStatus(null);
+        updateFormStatus(null);
     }
     
     private void getUsers()
@@ -373,6 +376,16 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
         m_male.setChecked(user.getGender().equals("male"));
         m_female.setChecked(user.getGender().equals("female"));
+        
+        for (FormFeedback f : m_feedbacks) {
+            if (m_currentUser != null) {
+                f.setStatus(FormFeedback.VALID);
+            } else {
+                f.setStatus(FormFeedback.NONE);
+            }
+        }
+        
+        updateFormStatus(null);
     }
 
     @Override
@@ -385,7 +398,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getNativeKeyCode() != KeyCodes.KEY_TAB) {
-            // updateFormStatus((Widget) event.getSource());
+            updateFormStatus((Widget) event.getSource());
         }
     }
     
@@ -395,6 +408,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             MessageUtil.showWarning("No user selected to save.", false);
             return;
         }
+        
+        m_save.setInProgress(true);
         
         m_currentUser.setFirstName(m_firstName.getText());
         m_currentUser.setLastName(m_lastName.getText());
@@ -414,16 +429,19 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
                 {
                     MessageUtil.showMessage("The user was saved successfully");
                     getUsers();
+                    m_save.setInProgress(false);
                 }
     
                 public void error(String message)
                 {
                     MessageUtil.showFatalError(message);
+                    m_save.setInProgress(false);
                 }
     
                 public void error(RESTException e)
                 {
                     MessageUtil.showFatalError(e.getReason());
+                    m_save.setInProgress(false);
                 }
             });
     }
@@ -435,23 +453,116 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             return;
         }
         
+        m_del.setInProgress(true);
+        m_currentUser = null;
+        
         m_currentUser.delete(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
                     MessageUtil.showMessage("The user was deleted");
                     getUsers();
+                    m_del.setInProgress(false);
                 }
     
                 public void error(String message)
                 {
                     MessageUtil.showFatalError(message);
+                    m_del.setInProgress(false);
                 }
     
                 public void error(RESTException e)
                 {
                     MessageUtil.showFatalError(e.getReason());
+                    m_del.setInProgress(false);
                 }
             });
+    }
+    
+    /**
+     * Validate that the specified field is filled in and valid.
+     * 
+     * @param tb        the field to validate
+     * @param minLength the minimum character length of the field
+     * @param feedback  the feedback control for this field
+     * @param error     the error to show in the feedback if the field isn't valid
+     */
+    private void validateField(TextBoxBase tb, int minLength, FormFeedback feedback, String error)
+    {
+        if (tb.getText().length() > minLength) {
+            feedback.setStatus(FormFeedback.VALID);
+            feedback.setTitle("");
+        } else {
+            feedback.setStatus(FormFeedback.WARNING);
+            feedback.setTitle(error);
+        }
+    }
+    
+    /**
+     * Enable or disable the save button based on the state of the fields.
+     */
+    private void enableSaveButton()
+    {
+        /*
+         * We only want to enable the save button if every field is valid
+         */
+        for (FormFeedback feedback : m_feedbacks) {
+            if (feedback.getStatus() != FormFeedback.VALID) {
+                m_save.setEnabled(false);
+                return;
+            }
+        }
+
+        m_save.setEnabled(true);
+    }
+
+    /**
+     * Validate the second password field.
+     */
+    private void validatePasswordRepeat()
+    {
+        validateField(m_passwordRepeat, 2, m_passwordRepeatFeedback, "Your passwords don't match");
+        if (m_passwordRepeat.getText().equals(m_password.getText())) {
+            m_passwordRepeatFeedback.setStatus(FormFeedback.VALID);
+            m_passwordRepeatFeedback.setTitle("");
+        } else {
+            m_passwordRepeatFeedback.setStatus(FormFeedback.ERROR);
+            m_passwordRepeatFeedback.setTitle("Your passwords don't match");
+        }
+    }
+    
+    private void updateFormStatus(Widget w)
+    {
+        if (w == m_firstName) {
+            validateField(m_firstName, 2, m_firstNameFeedback, "First name must be more than two characters");
+        } else if (w == m_lastName) {
+            validateField(m_lastName, 2, m_lastNameFeedback, "Last name must be more than two characters");
+        } else if (w == m_email) {
+            validateEmail();
+        } else if (w == m_password) {
+            validateField(m_password, 2, m_passwordFeedback, "Password name must be more than two characters");
+        } else if (w == m_bDay) {
+            //validateBirthday();
+        } else if (w == m_passwordRepeat) {
+            validatePasswordRepeat();
+        } else if (w == m_userDesc) {
+            validateField(m_userDesc, 8, m_userDescFeedback, "The user description must be more than two characters");
+        }
+
+        enableSaveButton();
+    }
+    
+    /**
+     * Validate that the email field is filled in with a valid email address.
+     */
+    private void validateEmail()
+    {
+        if (JSUtil.validateEmail(m_email.getText())) {
+            m_emailFeedback.setStatus(FormFeedback.VALID);
+            m_emailFeedback.setTitle("");
+        } else {
+            m_emailFeedback.setStatus(FormFeedback.ERROR);
+            m_emailFeedback.setTitle("Invalid email address");
+        }
     }
 }
 

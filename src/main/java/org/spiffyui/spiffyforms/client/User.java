@@ -139,7 +139,7 @@ class User
                     ArrayList<User> users = new ArrayList<User>();
                     
                     for (int i = 0; i < usersArray.size(); i++) {
-                        if (usersArray.get(i).isNull()) {
+                        if (usersArray.get(i).isNull() != null) {
                             continue;
                         }
                         

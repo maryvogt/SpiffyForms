@@ -76,3 +76,9 @@ h2 {
 button.spiffy-del-button {
     background: url("org.spiffyui.spiffyforms.index/images/spiffy_ui_images.png") no-repeat scroll 10px -5px #EDEEEC;
 }
+
+#userListGrid {
+    height: 100px;
+    overflow: auto;
+    width: 690px;
+}
