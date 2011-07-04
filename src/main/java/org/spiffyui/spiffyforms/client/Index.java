@@ -17,19 +17,17 @@ package org.spiffyui.spiffyforms.client;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.spiffyui.client.JSONUtil;
 import org.spiffyui.client.MainFooter;
 import org.spiffyui.client.MainHeader;
 import org.spiffyui.client.MessageUtil;
-import org.spiffyui.client.rest.RESTCallback;
 import org.spiffyui.client.rest.RESTException;
 import org.spiffyui.client.rest.RESTObjectCallBack;
-import org.spiffyui.client.rest.RESTility;
 import org.spiffyui.client.widgets.DatePickerTextBox;
 import org.spiffyui.client.widgets.FormFeedback;
-import org.spiffyui.client.widgets.LongMessage;
 import org.spiffyui.client.widgets.button.FancyButton;
 import org.spiffyui.client.widgets.button.FancySaveButton;
 
@@ -42,17 +40,13 @@ import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONObject;
-import com.google.gwt.json.client.JSONValue;
-import com.google.gwt.json.client.JSONValue;
+import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.RadioButton;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.TextBox;
-
 
 /**
  * This class is the main entry point for our GWT module.
@@ -90,6 +84,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private FancyButton m_save;
 
     private List<FormFeedback> m_feedbacks = new ArrayList<FormFeedback>();
+    
+    private Map<String, Anchor> m_anchors = new HashMap<String, Anchor>();
 
     /**
      * The Index page constructor
@@ -286,10 +282,12 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
                 userHTML.append("<div class=\"gridlistitem oddrow\">");
             }
             
+            String id = HTMLPanel.createUniqueId();
+            
             /*
              The user id
              */
-            userHTML.append("<div class=\"useridcol\">" + u.getUserId() + "</div>");
+            userHTML.append("<div id=\"" + id + "\" class=\"useridcol\"></div>");
             
             /*
              The user's name
@@ -301,16 +299,38 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
              */
             userHTML.append("<div class=\"useremailcol\">" + u.getEmail() + "</div>");
             
-            userHTML.append("</div");
+            userHTML.append("</div>");
+            
+            Anchor a = new Anchor(u.getUserId(), "#");
+            a.getElement().setPropertyObject("user", u);
+            a.addClickHandler(this);
+            m_anchors.put(id, a);
         }
         
         m_panel.getElementById("userListGrid").setInnerHTML(userHTML.toString());
+        
+        /*
+         Now that we've added the elements to the DOM we can add the
+         anchors
+         */
+        for (String id : m_anchors.keySet()) {
+            m_panel.add(m_anchors.get(id), id);
+        }
     }
     
     @Override
     public void onClick(ClickEvent event)
     {
+        event.preventDefault();
         
+        if (event.getSource() instanceof Anchor) {
+            showUser((User) ((Anchor) event.getSource()).getElement().getPropertyObject("user"));
+        }
+    }
+    
+    private void showUser(User user)
+    {
+        m_firstName.setText(user.getFirstName());
     }
 
     @Override
