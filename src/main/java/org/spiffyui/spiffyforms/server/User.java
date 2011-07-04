@@ -40,6 +40,7 @@ import org.json.JSONObject;
 // The Java class will be hosted at the URI path "/users"
 @Path("/users/{arg1}")
 public class User {
+    static final String RESULT_SUCCESS = "{\"result\" : \"success\"}";
 
     @Context UriInfo uriInfo;
 
@@ -70,6 +71,36 @@ public class User {
 	// if we got here then we didn't find it
 	return null;
     }
+
+    // this Java method finds a particular user in the list of users
+    private int findUserIndexInArray(String userID){
+	JSONArray users = Users.getUserList();
+	if (users == null)
+	    return -1;
+
+	JSONObject user = null;
+	int len = users.length();
+	try {
+	    for (int i=0; i<len; i++) {
+		user = users.getJSONObject(i);
+
+		if (user != null){
+		    String id = user.getString("userID");
+		    if (userID.equals(id)){
+			// found it!
+			return i;
+		    }
+		}
+	    }
+	} catch (JSONException je){
+	    // not going to happen in this demo app
+	}
+		    
+	// if we got here then we didn't find it
+	return -1;
+    }
+
+
 
     // The Java method will process HTTP GET requests
     @GET 
@@ -122,30 +153,50 @@ public class User {
 	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
 	}
 
-	return "{\"result\" : \"success\"}";
+	return RESULT_SUCCESS;
     }
 
     @PUT 
+    // Modify the information stored for a given user. 
     // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
-    @Produces("text/plain")
+    // type "application/JSON"
+    @Produces("application/JSON")
     public String updateUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
-        String arg1 = params.getFirst("arg1");
-
-        // Return some cliched textual content
-        return "you updated user " + arg1 + " with: " + input;
+        String userID = params.getFirst("arg1");
+	// we know userID is non-null
+	JSONObject storedUser = findUserInArray(userID);
+	if (storedUser != null){
+	    try {
+		JSONObject inputUser = new JSONObject(input);
+		Iterator iter = inputUser.keys();
+		while (iter.hasNext()){
+		    String key = iter.Next();
+		    storedUser.put(key, inputUser.get(key));
+		}
+	    } catch (JSONException je){
+		// I don't know what could make this happen
+		throw new WebApplicationException(Response.Status.BAD_REQUEST);
+	    }
+	} else {
+	    throw new WebApplicationException(Response.Status.NOT_FOUND);
+	}
+	return RESULT_SUCCESS;
     }
 
     @DELETE 
     // The Java method will produce content identified by the MIME Media
-    // type "text/plain"
-    @Produces("text/plain")
+    // type "application/JSON"
+    @Produces("application/JSON")
     public String deleteUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
-        String arg1 = params.getFirst("arg1");
-
-        // Return some cliched textual content
-        return "you deleted user " + arg1 + " with: " + input;
+        String userID = params.getFirst("arg1");
+	// we know userID is non-null
+	int i = findUserIndexInArray(userID);
+	if (i != -1){ // -1 means not found
+	    users.remove(i);
+	} else {
+	    throw new WebApplicationException(Response.Status.NOT_FOUND);
+	}
     }
 }
