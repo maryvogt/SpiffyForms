@@ -306,6 +306,10 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         updateFormStatus(null);
     }
     
+    // RESTObjectCallBack is a class provided by SpiffyUI.
+    //  A class calling the RESTObjectCallBack only has
+    //  to deal with well formed Java objects in GWT and doesn't need to parse JSON
+    // or handle HTTP errors.
     private void getUsers()
     {
         User.getUsers(new RESTObjectCallBack<User[]>() {
