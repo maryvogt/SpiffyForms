@@ -1,8 +1,11 @@
 [Spiffy UI](http://www.spiffyui.org) - GWT made simple
 ==================================================
 
-This is an application created from the [Spiffy UI Framework](http://www.spiffyui.org) project creator, which builds a simple REST application with Apache Maven.
+This sample shows you how to create, read, update, and delete with Spiffy UI forms.  It includes a simple REST server running on Java with [Jersey](http://jersey.java.net/).
 
+Everything starts with a [REST bean](http://www.spiffyui.org/!#rest) named `User.java`.  This bean handles the [CRUD ](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations of our application.  The UI is handled in `Index.java`.
+
+This application shows you how to make the full range or REST requests and build complex form layouts with Spiffy UI.
 
 Building and Running SpiffyForms
 --------------------------------------
@@ -22,6 +25,97 @@ Debugging through Eclipse
 --------------------------------------
 
 See [Spiffy UI's GWT Dev Mode page](http://www.spiffyui.org/#!hostedMode) for more information.
+
+The REST API
+--------------------------------------
+
+This application exposes a simple REST API for editing users:
+
+*GET /api/users* - Get a list of users including user details.  
+
+    [
+        {
+            "birthday": "-11995200000",
+            "lastName": "Addams",
+            "userID": "aadams",
+            "desc": "Alice Addams is just some girl",
+            "email": "aadams@amazon.com",
+            "gender": "female",
+            "firstName": "Alice",
+            "password": "aaa"
+        },
+        {
+            "birthday": "269582400000",
+            "lastName": "Brown",
+            "userID": "bbrown",
+            "desc": "Bob Brown is just some guy",
+            "email": "bbrown@bn.com",
+            "gender": "male",
+            "firstName": "Bob",
+            "password": "b0bpass"
+        }
+    ]
+    
+*GET /api/users/<user id> - Get the data about the specified user.
+
+    {
+        "birthday": "-11995200000",
+        "lastName": "Addams",
+        "userID": "aadams",
+        "desc": "Alice Addams is just some girl",
+        "email": "aadams@amazon.com",
+        "gender": "female",
+        "firstName": "Alice",
+        "password": "aaa"
+    }
+    
+Returns a 404 if the specified user ID doesn't exist
+
+*POST /api/users/<user id> - Add the specified user.
+
+Input:
+
+    {
+        "birthday": "-11995200000",
+        "lastName": "Addams",
+        "userID": "aadams",
+        "desc": "Alice Addams is just some girl",
+        "email": "aadams@amazon.com",
+        "gender": "female",
+        "firstName": "Alice",
+        "password": "aaa"
+    }
+    
+Output:
+
+    {"success": true}
+    
+*PUT /api/users/<user id> - Update information about the specified user.
+
+Input:
+
+    {
+        "birthday": "-11995200000",
+        "lastName": "Addams",
+        "userID": "aadams",
+        "desc": "Alice Addams is just some girl",
+        "email": "aadams@amazon.com",
+        "gender": "female",
+        "firstName": "Alice",
+        "password": "aaa"
+    }
+    
+Output:
+
+    {"success": true}
+    
+*DELETE /api/users/<user id> - Delete the specified user from the system
+
+Output:
+
+    {"success": true}
+    
+Returns a 404 if the specified user ID doesn't exist
 
 
 License
