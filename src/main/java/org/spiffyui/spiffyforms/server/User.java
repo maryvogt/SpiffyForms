@@ -124,28 +124,31 @@ public class User {
 	JSONObject user = findUserInArray(userid);
 	if (user == null) {
 	    try {
-		JSONObject reason = new JSONObject();
-		reason.put("Text", "User id \""+ userid+"\" not found");
-
-		JSONObject subcode = new JSONObject();
-		subcode.put("Value", "0");
-	    
-		JSONObject code = new JSONObject();
-		code.put("Subcode", subcode);
-		code.put("Value", Response.Status.NOT_FOUND);
-	    
-		JSONObject fault = new JSONObject();
-		fault.put("Code", code);
-		fault.put("Reason", reason);
-
-		Response.ResponseBuilder rb = Response.status(Response.Status.NOT_FOUND);
-		rb.entity(fault.toString());
-		Response response = rb.build();
-
-		throw new WebApplicationException(response);
+    		JSONObject reason = new JSONObject();
+    		reason.put("Text", "User id \""+ userid+"\" not found");
+    
+    		JSONObject subcode = new JSONObject();
+    		subcode.put("Value", "0");
+    	    
+    		JSONObject code = new JSONObject();
+    		code.put("Subcode", subcode);
+    		code.put("Value", Response.Status.NOT_FOUND);
+    	    
+    		JSONObject fault = new JSONObject();
+    		fault.put("Code", code);
+    		fault.put("Reason", reason);
+			
+			JSONObject root = new JSONObject();
+			root.put("Fault", fault);
+    
+    		Response.ResponseBuilder rb = Response.status(Response.Status.NOT_FOUND);
+    		rb.entity(root.toString());
+    		Response response = rb.build();
+    
+    		throw new WebApplicationException(response);
 	    } catch (JSONException je){
-		// this is extremely unlikely to happen with the static data used here.
-		throw new WebApplicationException(500);
+    		// this is extremely unlikely to happen with the static data used here.
+    		throw new WebApplicationException(500);
 	    }
 	}
 
