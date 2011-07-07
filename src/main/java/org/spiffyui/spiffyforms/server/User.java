@@ -110,7 +110,7 @@ public class User {
     @Produces("application/json")
     // This method returns a JSONObject containing the user info 
     // for the userID passed in the arg1 parameter on the URL
-    public String getUserInfo() {
+    public Response getUserInfo() {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userid = params.getFirst("arg1");
 	
