@@ -645,9 +645,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         validateField(m_passwordRepeat, 2, m_passwordRepeatFeedback, "Your passwords don't match");
         if (m_passwordRepeat.getText().equals(m_password.getText())) {
             m_passwordRepeatFeedback.setStatus(FormFeedback.VALID);
+            m_passwordRepeatFeedback.setText("");
             m_passwordRepeatFeedback.setTitle("");
         } else {
             m_passwordRepeatFeedback.setStatus(FormFeedback.ERROR);
+            m_passwordRepeatFeedback.setText("Your passwords don't match");
             m_passwordRepeatFeedback.setTitle("Your passwords don't match");
         }
     }
@@ -655,12 +657,12 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private void updateFormStatus(Widget w)
     {
         if (w == m_userId) {
-            validateField(m_userId, 2, m_userIdFeedback, "User name must be more than two characters");
+            validateField(m_userId, 1, m_userIdFeedback, "User name must be more than two characters");
             validateUsername();
         } else if (w == m_firstName) {
-            validateField(m_firstName, 2, m_firstNameFeedback, "First name must be more than two characters");
+            validateField(m_firstName, 1, m_firstNameFeedback, "First name must be more than two characters");
         } else if (w == m_lastName) {
-            validateField(m_lastName, 2, m_lastNameFeedback, "Last name must be more than two characters");
+            validateField(m_lastName, 1, m_lastNameFeedback, "Last name must be more than two characters");
         } else if (w == m_email) {
             validateEmail();
         } else if (w == m_password) {
