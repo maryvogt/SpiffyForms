@@ -107,7 +107,7 @@ public class User {
     @GET 
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
-    //    @Produces("application/JSON")
+    @Produces("application/json")
     // This method returns a JSONObject containing the user info 
     // for the userID passed in the arg1 parameter on the URL
     public String getUserInfo() {
@@ -120,7 +120,30 @@ public class User {
 
 	JSONObject user = findUserInArray(userid);
 	if (user == null) {
-	    throw new WebApplicationException(Response.Status.NOT_FOUND);
+	    try {
+		JSONObject reason = new JSONObject();
+		reason.put("Text", "User id \""+ userid+"\" not found");
+
+		JSONObject subcode = new JSONObject();
+		subcode.put("Value", "0");
+	    
+		JSONObject code = new JSONObject();
+		code.put("Subcode", subcode);
+		code.put("Value", Response.Status.NOT_FOUND);
+	    
+		JSONObject fault = new JSONObject();
+		fault.put("Code", code);
+		fault.put("Reason", reason);
+
+		Response.ResponseBuilder rb = Response.status(Response.Status.NOT_FOUND);
+		rb.entity(fault.toString());
+		Response response = rb.build();
+
+		throw new WebApplicationException(response);
+	    } catch (JSONException je){
+		// this is extremely unlikely to happen with the static data used here.
+		throw new WebApplicationException(500);
+	    }
 	}
 	
 	return user.toString();
@@ -161,7 +184,8 @@ public class User {
     // Modify the information stored for a given user. 
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
-    @Produces("application/JSON")
+    @Produces("application/json")
+    @Consumes("application/json")
     public String updateUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
