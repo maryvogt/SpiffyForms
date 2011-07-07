@@ -145,8 +145,10 @@ public class User {
 		throw new WebApplicationException(500);
 	    }
 	}
-	
-	return user.toString();
+
+	Response.ResponseBuilder rb = Response.created();
+	rb.entity(user.toString());
+	return rb.build();
     }
 
 
