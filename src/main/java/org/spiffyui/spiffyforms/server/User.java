@@ -15,6 +15,9 @@
  ******************************************************************************/
 package org.spiffyui.spiffyforms.server;
 
+
+import java.net.URI;
+
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.Date;
@@ -110,7 +113,7 @@ public class User {
     @Produces("application/json")
     // This method returns a JSONObject containing the user info 
     // for the userID passed in the arg1 parameter on the URL
-    public Response getUserInfo() {
+    public String getUserInfo() {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userid = params.getFirst("arg1");
 	
@@ -146,9 +149,7 @@ public class User {
 	    }
 	}
 
-	Response.ResponseBuilder rb = Response.created();
-	rb.entity(user.toString());
-	return rb.build();
+	return user.toString();
     }
 
 
@@ -158,7 +159,7 @@ public class User {
     @Produces("application/JSON")
     // This method attempts to create new user info based on the info 
     // in the input string
-    public String createUser(String input) {
+    public Response createUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
 	// we know that userID is not null because of the Path annotation 
@@ -179,7 +180,9 @@ public class User {
 	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
 	}
 
-	return RESULT_SUCCESS;
+	Response.ResponseBuilder rb = Response.created(URI.create(userID));
+	rb.entity(RESULT_SUCCESS);
+	return rb.build();
     }
 
     @PUT 
@@ -187,7 +190,6 @@ public class User {
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/json")
-    @Consumes("application/json")
     public String updateUser(String input) {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
