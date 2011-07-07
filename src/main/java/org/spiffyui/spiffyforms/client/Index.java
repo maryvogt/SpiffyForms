@@ -437,8 +437,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
         m_userDesc.setText(user.getUserDesc());
         
-        m_male.setChecked(user.getGender().equals("male"));
-        m_female.setChecked(user.getGender().equals("female"));
+        m_male.setValue(user.getGender().equals("male"));
+        m_female.setValue(user.getGender().equals("female"));
         
         for (FormFeedback f : m_feedbacks) {
             f.setText("");
