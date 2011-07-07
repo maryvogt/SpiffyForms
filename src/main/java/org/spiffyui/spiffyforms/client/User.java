@@ -30,6 +30,11 @@ import com.google.gwt.json.client.JSONObject;
 import com.google.gwt.json.client.JSONString;
 import com.google.gwt.json.client.JSONValue;
 
+/**
+ * This class is our RESTBean for managing users.  It handles create, read, update, and
+ * delete of users from the server.  This class encapsulates all of the REST functions
+ * of our application and is responsible for turning JSON data into a Java object.
+ */
 class User
 {
     private String m_firstName = "";
@@ -129,8 +134,10 @@ class User
         return m_isNew;
     }
     
-    /*
-     * Send a request to get a list of users 
+    /**
+     * Get the list of users from the server
+     * 
+     * @param callback the callback for getting the list of users
      */
     public static void getUsers(final RESTObjectCallBack<User[]> callback)
     {
@@ -168,18 +175,24 @@ class User
                 @Override
                 public void onError(int statusCode, String errorResponse)
                 {
-                    MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+                    callback.error(errorResponse);
                 }
                 
                 @Override
                 public void onError(RESTException e)
                 {
-                    MessageUtil.showError(e.getReason());
+                    callback.error(e);
                 }
 	
 	    });
     }
     
+    /**
+     * Save the specified user to the server.  This method handles new users as well as updating
+     * existing users.
+     * 
+     * @param callback the callback to get the status of the save operation
+     */
     public void save(final RESTObjectCallBack<Boolean> callback)
     {
         
@@ -215,18 +228,23 @@ class User
                 @Override
                 public void onError(int statusCode, String errorResponse)
                 {
-                    MessageUtil.showError("Error.  Status Code: " + statusCode + " " + errorResponse);
+                    callback.error(errorResponse);
                 }
                 
                 @Override
                 public void onError(RESTException e)
                 {
-                    MessageUtil.showError(e.getReason());
+                    callback.error(e);
                 }
 	
 	    });
     }
     
+    /**
+     * Delete this user from the server.
+     * 
+     * @param callback the callback to indicate the success of the delete call
+     */
     public void delete(final RESTObjectCallBack<Boolean> callback)
     {
         
@@ -252,6 +270,14 @@ class User
 	    });
     }
     
+    /**
+     * This is a helper function to determine if the specified username is in use.  It makes
+     * a GET call to get the specified user information and returns true if the username is
+     * already used and false otherwise.
+     * 
+     * @param callback the callback
+     * @param username the username to check
+     */
     public static void isUsernameInUse(final RESTObjectCallBack<Boolean> callback, String username)
     {
         

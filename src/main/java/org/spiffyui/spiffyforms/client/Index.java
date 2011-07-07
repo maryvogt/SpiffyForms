@@ -330,6 +330,15 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             });
     }
     
+    /**
+     * Shows the list of users.  
+     * 
+     * We're building our list of users as a simple set of DIVs with style to make them easy
+     * to work with in our simple table.  We could use a table or another GWT widget for this,
+     * but DIV tags are fine for our simple example.
+     * 
+     * @param users  the users to display
+     */
     private void showUsers(User users[])
     {
         if (m_currentUser != null) {
@@ -401,6 +410,14 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
     }
     
+    /**
+     * Show the specified user.
+     * 
+     * This method clears out the user form, resets the validation widgets, and populates
+     * the form with the data about the specified user.
+     * 
+     * @param user   the user to show
+     */
     private void showUser(User user)
     {
         m_currentUser = user;
@@ -553,6 +570,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
     }
     
+    /**
+     * Validate the username in this form.  This method uses a timer and makes a REST call
+     * to the server to validate the username after the user has stopped typing for one
+     * second.
+     */
     private void validateUsername()
     {
         if (m_timer != null) {
@@ -560,6 +582,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
         
         if (m_userId.getText().length() < 2) {
+            m_userIdFeedback.setStatus(FormFeedback.WARNING);
+            m_userIdFeedback.setTitle("Username must be more than two characters");
             return;
         }
         
@@ -654,10 +678,20 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
     }
     
+    /**
+     *  Update the status of our form.  This method handles field validation and enabling
+     *  the save button.  This method is called when the user makes any change to the form.
+     *  
+     * When the user types in the first field we want to validate that field, but we don't
+     * want to validate the rest of them since the rest aren't filled in yet and we don't
+     * want to show invalid messages for fields they haven't edited yet.  This method takes
+     * the widget that was edited as an argument so it can validate just that field.
+     * 
+     * @param w      the widget that's being changed
+     */
     private void updateFormStatus(Widget w)
     {
         if (w == m_userId) {
-            validateField(m_userId, 1, m_userIdFeedback, "User name must be more than two characters");
             validateUsername();
         } else if (w == m_firstName) {
             validateField(m_firstName, 1, m_firstNameFeedback, "First name must be more than two characters");
@@ -694,6 +728,9 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 }
 
 
+/**
+ * This is a little class to handle our delete button.  It mostly just handles styling.
+ */
 class DeleteButton extends FancyButton
 {
     public DeleteButton(String s)
