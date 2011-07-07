@@ -97,3 +97,15 @@ button.spiffy-del-button {
 #userDetailsTitle {
     margin-top: 2em;
 }
+
+div.spiffy-formfeedback.valid {
+    color: green;
+    width: auto;
+    padding-left: 25px;
+}
+
+div.spiffy-formfeedback.error {
+    color: red;
+    width: auto;
+    padding-left: 25px;
+}

@@ -424,6 +424,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_female.setChecked(user.getGender().equals("female"));
         
         for (FormFeedback f : m_feedbacks) {
+            f.setText("");
             if (m_currentUser.isNew()) {
                 f.setStatus(FormFeedback.NONE);
             } else {
@@ -562,6 +563,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             return;
         }
         
+        m_userIdFeedback.setText("");
         m_userIdFeedback.setStatus(FormFeedback.LOADING);
         
         m_timer = new Timer() 
@@ -581,17 +583,18 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
      */
     private void runUserValidation()
     {
-        m_userIdFeedback.setStatus(FormFeedback.LOADING);
         m_userId.setEnabled(false);
         User.isUsernameInUse(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
                     if (b.booleanValue()) {
                         m_userIdFeedback.setStatus(FormFeedback.ERROR);
+                        m_userIdFeedback.setText("This username is already in use");
                         m_userId.setTitle("This username is already in use");
                         m_save.setEnabled(false);
                     } else {
                         m_userIdFeedback.setStatus(FormFeedback.VALID);
+                        m_userIdFeedback.setText("This username is available");
                         m_userId.setTitle("");
                     }
                     
