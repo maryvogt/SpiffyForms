@@ -15,12 +15,9 @@
  ******************************************************************************/
 package org.spiffyui.spiffyforms.server;
 
-import java.text.DateFormat;
-import java.util.Date;
-
 import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
 import org.json.JSONArray;
 import org.json.JSONException;

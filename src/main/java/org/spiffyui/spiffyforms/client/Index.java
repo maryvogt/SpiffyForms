@@ -61,7 +61,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     private static final String WIDE_TEXT_FIELD = "wideTextField";
     private static final SpiffyUiHtml STRINGS = (SpiffyUiHtml) GWT.create(SpiffyUiHtml.class);
 
-    private static Index g_index;
     private HTMLPanel m_panel;
     
     private TextBox m_userId;
@@ -106,8 +105,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
      * The Index page constructor
      */
     public Index()
-    {
-        g_index = this;
+    {        
     }
 
 
@@ -491,7 +489,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_currentUser.setBirthday(m_bDay.getDateValue());
         m_currentUser.setUserDesc(m_userDesc.getText());
         
-        if (m_male.isChecked()) {
+        if (m_male.getValue()) {
             m_currentUser.setGender("male");
         } else {
             m_currentUser.setGender("female");
