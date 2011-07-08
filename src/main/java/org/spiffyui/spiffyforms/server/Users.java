@@ -28,74 +28,68 @@ import org.json.JSONObject;
 
 // The Java class will be hosted at the URI path "/users"
 @Path("/users")
-public class Users {
-    
+public class Users
+{
+
     // maintain a list of users as a JSONArray for easy returning
     private static final JSONArray USER_LIST = new JSONArray();
 
-
-
-
     static {
 
-	// put in a couple of hardcoded demo users
-	JSONObject demoUser = new JSONObject();
-	try {
+        // put in a couple of hardcoded demo users
+        JSONObject demoUser = new JSONObject();
+        try {
 
-	    demoUser.put("userID", "aadams");
-	    demoUser.put("firstName", "Alice");
-	    demoUser.put("lastName", "Addams");
-	    demoUser.put("email", "aadams@amazon.com");
-	    demoUser.put("password", "aaa");
-	    demoUser.put("birthday", "-11995200000");
-	    demoUser.put("gender", "female");
-	    demoUser.put("desc", "Alice Addams is just some girl");
+            demoUser.put("userID", "aadams");
+            demoUser.put("firstName", "Alice");
+            demoUser.put("lastName", "Addams");
+            demoUser.put("email", "aadams@amazon.com");
+            demoUser.put("password", "aaa");
+            demoUser.put("birthday", "-11995200000");
+            demoUser.put("gender", "female");
+            demoUser.put("desc", "Alice Addams is just some girl");
 
-	    USER_LIST.put(demoUser);
+            USER_LIST.put(demoUser);
 
-	    demoUser = new JSONObject();
-	    demoUser.put("userID", "bbrown");
-	    demoUser.put("firstName", "Bob");
-	    demoUser.put("lastName", "Brown");
-	    demoUser.put("email", "bbrown@bn.com");
-	    demoUser.put("password", "b0bpass");
-	    demoUser.put("birthday", "269582400000");
-	    demoUser.put("gender", "male");
-	    demoUser.put("desc", "Bob Brown is just some guy");
-	    USER_LIST.put(demoUser);
+            demoUser = new JSONObject();
+            demoUser.put("userID", "bbrown");
+            demoUser.put("firstName", "Bob");
+            demoUser.put("lastName", "Brown");
+            demoUser.put("email", "bbrown@bn.com");
+            demoUser.put("password", "b0bpass");
+            demoUser.put("birthday", "269582400000");
+            demoUser.put("gender", "male");
+            demoUser.put("desc", "Bob Brown is just some guy");
+            USER_LIST.put(demoUser);
 
-	}
-	catch (JSONException je)
-	    {
-		// not going to happen with this hardcoded data!
-	    }
-	/*	catch (java.text.ParseException pe)
-	    {
-
-		// also not going to happen
-		}*/
+        } catch (JSONException je) {
+            // not going to happen with this hardcoded data!
+        }
+        /*
+         * catch (java.text.ParseException pe) { // also not going to happen }
+         */
     }
 
-
-    static JSONArray getUserList(){
-	return USER_LIST;
+    static JSONArray getUserList()
+    {
+        return USER_LIST;
     }
 
     // The Java method will process HTTP GET requests
-    @GET 
+    @GET
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/JSON")
-    public String doGetRequest() {
-	if (USER_LIST != null && USER_LIST.length() == 0)
-	    {
-		return "{\"error\": \"user list has no entries\"}";
-	    }
-	if (USER_LIST != null && USER_LIST.length() != 0)
-	    return USER_LIST.toString();
-	else
-	    return "{\"error\": \"user list not initialized\"}";
-}
+    public String doGetRequest()
+    {
+        if (USER_LIST != null && USER_LIST.length() == 0) {
+            return "{\"error\": \"user list has no entries\"}";
+        }
+        if (USER_LIST != null && USER_LIST.length() != 0)
+            return USER_LIST.toString();
+        else
+            return "{\"error\": \"user list not initialized\"}";
+    }
 
-    // what happens if you PUT or POST here? Doesn't seem interesting. 
+    // what happens if you PUT or POST here? Doesn't seem interesting.
 }

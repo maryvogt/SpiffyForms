@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.Date;
 import java.util.HashMap;
 
-
 import javax.ws.rs.GET;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
@@ -38,34 +37,37 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// The Java class will be hosted at the URI path "/users"
+// The Java class will be hosted at the URI path "/usernames"
 @Path("/usernames/{arg1}")
-public class Username {
+public class Username
+{
     static final String RESULT_TRUE = "{\"exists\" : true}";
-	static final String RESULT_FALSE = "{\"exists\" : false}";
+    static final String RESULT_FALSE = "{\"exists\" : false}";
 
-    @Context UriInfo uriInfo;
+    @Context
+    UriInfo uriInfo;
 
     // The Java method will process HTTP GET requests
-    @GET 
+    @GET
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
-    //    @Produces("application/JSON")
-    // This method returns a JSONObject containing the user info 
+    // @Produces("application/JSON")
+    // This method returns a JSONObject containing the user info
     // for the userID passed in the arg1 parameter on the URL
-    public String getUsername() {
+    public String getUsername()
+    {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userid = params.getFirst("arg1");
-	
-		if (userid == null) {
-			throw new WebApplicationException(400);
-		}
-	
-		JSONObject user = User.findUserInArray(userid);
-		if (user == null) {
-			return RESULT_FALSE;
-		} else {
-			return RESULT_TRUE;
-		}
+
+        if (userid == null) {
+            throw new WebApplicationException(400);
+        }
+
+        JSONObject user = User.findUserInArray(userid);
+        if (user == null) {
+            return RESULT_FALSE;
+        } else {
+            return RESULT_TRUE;
+        }
     }
 }
