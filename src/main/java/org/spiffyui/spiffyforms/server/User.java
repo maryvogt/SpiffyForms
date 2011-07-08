@@ -15,14 +15,12 @@
  ******************************************************************************/
 package org.spiffyui.spiffyforms.server;
 
-
 import java.net.URI;
 
 import java.text.DateFormat;
 import java.util.Iterator;
 import java.util.Date;
 import java.util.HashMap;
-
 
 import javax.ws.rs.GET;
 import javax.ws.rs.DELETE;
@@ -43,198 +41,223 @@ import org.json.JSONObject;
 
 // The Java class will be hosted at the URI path "/users"
 @Path("/users/{arg1}")
-public class User {
-    static final String RESULT_SUCCESS = "{\"result\" : \"success\"}";
+public class User
+{
+    static private final String RESULT_SUCCESS = "{\"result\" : \"success\"}";
+    static private final String USER_NOT_FOUND = "Userid not found: ";
 
-    @Context UriInfo uriInfo;
+    @Context
+    UriInfo uriInfo;
 
     // this Java method finds a particular user in the list of users
-    static JSONObject findUserInArray(String userID){
-	JSONArray users = Users.getUserList();
-	if (users == null)
-	    return null;
+    static JSONObject findUserInArray(String userID)
+    {
+        JSONArray users = Users.getUserList();
+        if (users == null)
+            return null;
 
-	JSONObject user = null;
-	int len = users.length();
-	try {
-	    for (int i=0; i<len; i++) {
-		user = users.getJSONObject(i);
+        JSONObject user = null;
+        int len = users.length();
+        try {
+            for (int i = 0; i < len; i++) {
+                user = users.getJSONObject(i);
 
-		if (user != null){
-		    String id = user.getString("userID");
-		    if (userID.equals(id)){
-			// found it!
-			return user;
-		    }
-		}
-	    }
-	} catch (JSONException je){
-	    // not going to happen in this demo app
-	}
-		    
-	// if we got here then we didn't find it
-	return null;
+                if (user != null) {
+                    String id = user.getString("userID");
+                    if (userID.equals(id)) {
+                        // found it!
+                        return user;
+                    }
+                }
+            }
+        } catch (JSONException je) {
+            // not going to happen in this demo app
+        }
+
+        // if we got here then we didn't find it
+        return null;
     }
 
     // this Java method finds a particular user in the list of users
-    static int findUserIndexInArray(String userID){
-	JSONArray users = Users.getUserList();
-	if (users == null)
-	    return -1;
+    static int findUserIndexInArray(String userID)
+    {
+        JSONArray users = Users.getUserList();
+        if (users == null)
+            return -1;
 
-	JSONObject user = null;
-	int len = users.length();
-	try {
-	    for (int i=0; i<len; i++) {
-		user = users.getJSONObject(i);
+        JSONObject user = null;
+        int len = users.length();
+        try {
+            for (int i = 0; i < len; i++) {
+                user = users.getJSONObject(i);
 
-		if (user != null){
-		    String id = user.getString("userID");
-		    if (userID.equals(id)){
-			// found it!
-			return i;
-		    }
-		}
-	    }
-	} catch (JSONException je){
-	    // not going to happen in this demo app
-	}
-		    
-	// if we got here then we didn't find it
-	return -1;
-    }
+                if (user != null) {
+                    String id = user.getString("userID");
+                    if (userID.equals(id)) {
+                        // found it!
+                        return i;
+                    }
+                }
+            }
+        } catch (JSONException je) {
+            // not going to happen in this demo app
+        }
 
-
+        // if we got here then we didn't find it
+        return -1;
+    }// end findUserIndexInArray()
 
     // The Java method will process HTTP GET requests
-    @GET 
+    @GET
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/json")
-    // This method returns a JSONObject containing the user info 
+    // This method returns a JSONObject containing the user info
     // for the userID passed in the arg1 parameter on the URL
-    public String getUserInfo() {
+    public String getUserInfo()
+    {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userid = params.getFirst("arg1");
-	
-	if (userid == null){
-	    throw new WebApplicationException(400);
-	}
+        // we know that userid is not null because of the @path annotation
 
-	JSONObject user = findUserInArray(userid);
-	if (user == null) {
-	    try {
-    		JSONObject reason = new JSONObject();
-    		reason.put("Text", "User id \""+ userid+"\" not found");
-    
-    		JSONObject subcode = new JSONObject();
-    		subcode.put("Value", "0");
-    	    
-    		JSONObject code = new JSONObject();
-    		code.put("Subcode", subcode);
-    		code.put("Value", Response.Status.NOT_FOUND);
-    	    
-    		JSONObject fault = new JSONObject();
-    		fault.put("Code", code);
-    		fault.put("Reason", reason);
-			
-			JSONObject root = new JSONObject();
-			root.put("Fault", fault);
-    
-    		Response.ResponseBuilder rb = Response.status(Response.Status.NOT_FOUND);
-    		rb.entity(root.toString());
-    		Response response = rb.build();
-    
-    		throw new WebApplicationException(response);
-	    } catch (JSONException je){
-    		// this is extremely unlikely to happen with the static data used here.
-    		throw new WebApplicationException(500);
-	    }
-	}
+        JSONObject user = findUserInArray(userid);
+        if (user == null) {
+            throw buildException(Response.Status.NOT_FOUND, USER_NOT_FOUND + userid);
+        }
 
-	return user.toString();
+        return user.toString();
     }
 
-
-    @POST 
+    @POST
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/JSON")
-    // This method attempts to create new user info based on the info 
+    // This method attempts to create new user info based on the info
     // in the input string
-    public Response createUser(String input) {
+    public Response createUser(String input)
+    {
+        Response resp;
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
-	// we know that userID is not null because of the Path annotation 
+        // we know that userID is not null because of the Path annotation
+        Response.ResponseBuilder rb;
 
-	// do we already have this user? 
-	if (findUserInArray(userID) != null){
-	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
-	}
+        // userids can't have spaces
+        if (userID.indexOf(' ') != -1) {
+            throw buildException(Response.Status.BAD_REQUEST, "UserIDs cannot have spaces. UserID: " + userID);
+        }
 
-	try {
-	    JSONArray userList = Users.getUserList();
-	    if (userList != null){
-		userList.put(new JSONObject(input));
-	    }		    
-	} catch (JSONException je){
-	    // input string was probably not correctly formatted JSON.
-	    // we could perhaps be more informative here.
-	    throw new WebApplicationException(Response.Status.BAD_REQUEST);
-	}
+        // do we already have this user?
+        if (findUserInArray(userID) != null) {
+            throw buildException(Response.Status.NOT_FOUND, USER_NOT_FOUND + userID);
+        }
 
-	Response.ResponseBuilder rb = Response.created(URI.create(userID));
-	rb.entity(RESULT_SUCCESS);
-	return rb.build();
+        try {
+            JSONArray userList = Users.getUserList();
+            if (userList != null) {
+                userList.put(new JSONObject(input));
+            }
+        } catch (JSONException je) {
+            // input string was probably not correctly formatted JSON.
+            throw buildException(Response.Status.BAD_REQUEST, "Could not parse JSON data: " + input);
+        }
+
+        rb = Response.created(URI.create(userID));
+        rb.entity(RESULT_SUCCESS);
+        return rb.build();
     }
 
-    @PUT 
-    // Modify the information stored for a given user. 
+    @PUT
+    // Modify the information stored for a given user.
     // The Java method will produce content identified by the MIME Media
-    // type "application/JSON"
+    // type "application/json"
     @Produces("application/json")
-    public String updateUser(String input) {
+    public String updateUser(String input)
+    {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
-	// we know userID is non-null
-	JSONObject storedUser = findUserInArray(userID);
-	if (storedUser != null){
-	    try {
-		JSONObject inputUser = new JSONObject(input);
-		Iterator iter = inputUser.keys();
-		while (iter.hasNext()){
-		    String key = (String)iter.next();
-		    storedUser.put(key, inputUser.get(key));
-		}
-	    } catch (JSONException je){
-		// I don't know what could make this happen
-		throw new WebApplicationException(Response.Status.BAD_REQUEST);
-	    }
-	} else {
-	    throw new WebApplicationException(Response.Status.NOT_FOUND);
-	}
-	return RESULT_SUCCESS;
+        // we know userID is non-null
+        JSONObject storedUser = findUserInArray(userID);
+        if (storedUser != null) {
+            try {
+                JSONObject inputUser = new JSONObject(input);
+                Iterator iter = inputUser.keys();
+                while (iter.hasNext()) {
+                    String key = (String) iter.next();
+                    storedUser.put(key, inputUser.get(key));
+                }
+            } catch (JSONException je) {
+                // generic error
+                throw buildException(Response.Status.BAD_REQUEST, "Could not modify user info: " + userID);
+            }
+        } else {
+            throw buildException(Response.Status.NOT_FOUND, USER_NOT_FOUND + userID);
+        }
+        return RESULT_SUCCESS;
     }
 
-    @DELETE 
+    @DELETE
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/JSON")
-    public String deleteUser(String input) {
+    public String deleteUser(String input)
+    {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
-	// we know userID is non-null
-	int i = findUserIndexInArray(userID);
-	if (i != -1){ // -1 means not found
-	    JSONArray userList = Users.getUserList();
-	    try {
-		userList.put(i, (Object) null);
-	    } catch (JSONException e) {
-		e.printStackTrace();
-	    }
-	    return "{\"success\":true}";
-	} else {
-	    throw new WebApplicationException(Response.Status.NOT_FOUND);
-	}
+        // we know userID is non-null
+        int i = findUserIndexInArray(userID);
+        if (i != -1) { // -1 means not found
+            JSONArray userList = Users.getUserList();
+            try {
+                userList.put(i, (Object) null);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            return "{\"success\":true}";
+        } else {
+            throw buildException(Response.Status.NOT_FOUND, USER_NOT_FOUND + userID);
+
+        }
+    }
+
+    /*
+     * Private methods
+     */
+
+    static private WebApplicationException buildException(Response.Status code, String reason)
+    {
+        Response r = buildErrorResponse(code, reason);
+        return new WebApplicationException(r);
+    }
+
+    static private Response buildErrorResponse(Response.Status code, String reason)
+    {
+        JSONObject root = null;
+        Response.ResponseBuilder rb = Response.status(code);
+
+        try {
+            JSONObject r = new JSONObject();
+            r.put("Text", reason);
+            JSONObject subcode = new JSONObject();
+            subcode.put("Value", "0");
+            JSONObject c = new JSONObject();
+            c.put("Subcode", subcode);
+            c.put("Value", code);
+            JSONObject f = new JSONObject();
+            f.put("Code", c);
+            f.put("Reason", r);
+
+            root = new JSONObject();
+            root.put("Fault", f);
+        } catch (JSONException je) {
+            // unlikely to happen with this simple setup information
+            // but if it does,
+            // we can still return a Response without the JSON data.
+        }
+
+        if (root != null) {
+            rb.entity(root.toString());
+        }
+        return rb.build();
     }
 }
