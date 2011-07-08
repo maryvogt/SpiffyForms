@@ -16,24 +16,19 @@
 package org.spiffyui.spiffyforms.server;
 
 import java.net.URI;
-
-import java.text.DateFormat;
 import java.util.Iterator;
-import java.util.Date;
-import java.util.HashMap;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
-import javax.ws.rs.Produces;
 import javax.ws.rs.Path;
-
+import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.WebApplicationException;
 
 import org.json.JSONArray;
 import org.json.JSONException;
