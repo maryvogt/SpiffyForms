@@ -343,7 +343,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             showUser(m_currentUser);
         } else if (users.length > 0) {
             showUser(users[0]);
+        } else {
+            showUser(new User());
         }
+        
+        m_userId.setFocus(true);
         
         for (String id : m_anchors.keySet()) {
             m_anchors.get(id).removeFromParent();
