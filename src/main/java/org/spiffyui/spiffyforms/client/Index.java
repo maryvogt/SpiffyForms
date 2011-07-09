@@ -502,7 +502,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_currentUser.save(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
-                    MessageUtil.showMessage("The user was saved successfully");
+                    MessageUtil.showMessage(m_currentUser.getUserId() + " was saved successfully");
                     getUsers();
                     m_save.setInProgress(false);
                 }
@@ -533,9 +533,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         m_currentUser.delete(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
-                    MessageUtil.showMessage("The user was deleted");
-		    // clear out m_currentUser
-		    m_currentUser = null;
+                    MessageUtil.showMessage("Finished deleting " + m_currentUser.getUserId());
+                    
+        		    // clear out m_currentUser
+        		    m_currentUser = null;
+                    
                     getUsers();
                     m_del.setInProgress(false);
                 }
