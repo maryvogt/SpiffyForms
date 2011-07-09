@@ -210,7 +210,9 @@ public class User
             }
             return "{\"success\":true}";
         } else {
-            throw buildException(Response.Status.NOT_FOUND, USER_NOT_FOUND + userID);
+            throw buildException(Response.Status.NOT_FOUND, 
+				 USER_NOT_FOUND + userID,
+				 Users.getUserList());
 
         }
     }
@@ -225,7 +227,18 @@ public class User
         return new WebApplicationException(r);
     }
 
+    static private WebApplicationException buildException(Response.Status code, String reason, JSONArray extraJSONInfo)
+    {
+	Response r = buildErrorResponse(code, reason, extraJSONInfo);
+	return new WebApplicationException(r);
+    }
+
     static private Response buildErrorResponse(Response.Status code, String reason)
+    {
+	return buildErrorResponse(code, reason, null);
+    }
+
+    static private Response buildErrorResponse(Response.Status code, String reason, JSONArray extraJSONInfo)
     {
         JSONObject root = null;
         Response.ResponseBuilder rb = Response.status(code);
@@ -242,8 +255,13 @@ public class User
             f.put("Code", c);
             f.put("Reason", r);
 
+
             root = new JSONObject();
             root.put("Fault", f);
+
+	    if (extraJSONInfo != null)
+		root.put("ExtraInfo", extraJSONInfo);
+
         } catch (JSONException je) {
             // unlikely to happen with this simple setup information
             // but if it does,

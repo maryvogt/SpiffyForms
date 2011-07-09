@@ -19,11 +19,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.spiffyui.client.JSONUtil;
+import org.spiffyui.client.JSUtil;
 import org.spiffyui.client.MessageUtil;
 import org.spiffyui.client.rest.RESTCallback;
 import org.spiffyui.client.rest.RESTException;
 import org.spiffyui.client.rest.RESTObjectCallBack;
 import org.spiffyui.client.rest.RESTility;
+
+import com.google.gwt.http.client.URL;
 
 import com.google.gwt.json.client.JSONArray;
 import com.google.gwt.json.client.JSONObject;
@@ -217,7 +220,7 @@ class User
             m = RESTility.POST;
         }
         
-        RESTility.callREST("api/users/" + getUserId(), user.toString(), m, new RESTCallback() {
+        RESTility.callREST(getURIForID(getUserId()), user.toString(), m, new RESTCallback() {
                 @Override
                 public void onSuccess(JSONValue val)
                 {
@@ -247,8 +250,8 @@ class User
      */
     public void delete(final RESTObjectCallBack<Boolean> callback)
     {
-        
-        RESTility.callREST("api/users/"  + getUserId(), null, RESTility.DELETE, new RESTCallback() {
+        RESTility.callREST(getURIForID(getUserId()),
+			   null, RESTility.DELETE, new RESTCallback() {
                 @Override
                 public void onSuccess(JSONValue val)
                 {
@@ -281,7 +284,8 @@ class User
     public static void isUsernameInUse(final RESTObjectCallBack<Boolean> callback, String username)
     {
         
-        RESTility.callREST("api/users/"  + username, new RESTCallback() {
+        RESTility.callREST(getURIForID(username),
+			   new RESTCallback() {
                 @Override
                 public void onSuccess(JSONValue val)
                 {
@@ -311,4 +315,9 @@ class User
 	    });
     }
 
+    private static String getURIForID(String userid)
+    {
+	return "api/users/" + URL.encodeComponent(userid);
+    }
+	
 }

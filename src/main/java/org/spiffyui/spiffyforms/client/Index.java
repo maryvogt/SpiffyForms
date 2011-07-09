@@ -525,12 +525,13 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
         
         m_del.setInProgress(true);
-        m_currentUser = null;
         
         m_currentUser.delete(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
                     MessageUtil.showMessage("The user was deleted");
+		    // clear out m_currentUser
+		    m_currentUser = null;
                     getUsers();
                     m_del.setInProgress(false);
                 }
