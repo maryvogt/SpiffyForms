@@ -17,6 +17,7 @@ package org.spiffyui.spiffyforms.server;
 
 import java.net.URI;
 import java.util.Iterator;
+import java.util.logging.Logger;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -38,6 +39,8 @@ import org.json.JSONObject;
 @Path("/users/{arg1}")
 public class User
 {
+    private static final Logger LOGGER = Logger.getLogger(User.class.getName());
+    
     static private final String RESULT_SUCCESS = "{\"result\" : \"success\"}";
     static private final String USER_NOT_FOUND = "Userid not found: ";
 
@@ -55,18 +58,13 @@ public class User
         int len = users.length();
         try {
             for (int i = 0; i < len; i++) {
-                user = users.getJSONObject(i);
-
-                if (user != null) {
-                    String id = user.getString("userID");
-                    if (userID.equals(id)) {
-                        // found it!
-                        return user;
-                    }
+                if (!users.isNull(i) && userID.equals(users.getJSONObject(i).getString("userID"))) {
+                    // found it!
+                    return users.getJSONObject(i);
                 }
             }
         } catch (JSONException je) {
-            // not going to happen in this demo app
+            LOGGER.throwing(User.class.getName(), "findUserInArray", je);
         }
 
         // if we got here then we didn't find it
@@ -89,8 +87,7 @@ public class User
                 }
             }
         } catch (JSONException je) {
-            // not going to happen in this demo app
-            je.printStackTrace();
+            LOGGER.throwing(User.class.getName(), "findUserIndexArray", je);
         }
 
         // if we got here then we didn't find it
@@ -148,6 +145,7 @@ public class User
                 userList.put(new JSONObject(input));
             }
         } catch (JSONException je) {
+            LOGGER.throwing(User.class.getName(), "createUser", je);
             // input string was probably not correctly formatted JSON.
             throw buildException(Response.Status.BAD_REQUEST, "Could not parse JSON data: " + input);
         }
@@ -177,6 +175,7 @@ public class User
                     storedUser.put(key, inputUser.get(key));
                 }
             } catch (JSONException je) {
+                LOGGER.throwing(User.class.getName(), "updateUser", je);
                 // generic error
                 throw buildException(Response.Status.BAD_REQUEST, "Could not modify user info: " + userID);
             }
@@ -200,8 +199,8 @@ public class User
             JSONArray userList = Users.getUserList();
             try {
                 userList.put(i, (Object) null);
-            } catch (JSONException e) {
-                e.printStackTrace();
+            } catch (JSONException je) {
+                LOGGER.throwing(User.class.getName(), "deleteUser", je);
             }
             return "{\"success\":true}";
         } else {
@@ -254,16 +253,16 @@ public class User
             root = new JSONObject();
             root.put("Fault", f);
 
-	    if (extraJSONInfo != null)
-		root.put("ExtraInfo", extraJSONInfo);
+    	    if (extraJSONInfo != null) {
+                root.put("ExtraInfo", extraJSONInfo);
+            }
 
         } catch (JSONException je) {
-            // unlikely to happen with this simple setup information
-            // but if it does,
-            // we can still return a Response without the JSON data.
+            LOGGER.throwing(User.class.getName(), "buildErrorResponse", je);
         }
 
         if (root != null) {
+
             rb.entity(root.toString());
         }
         return rb.build();
