@@ -80,22 +80,17 @@ public class User
         if (users == null)
             return -1;
 
-        JSONObject user = null;
         int len = users.length();
         try {
             for (int i = 0; i < len; i++) {
-                user = users.getJSONObject(i);
-
-                if (user != null) {
-                    String id = user.getString("userID");
-                    if (userID.equals(id)) {
-                        // found it!
-                        return i;
-                    }
+                if (!users.isNull(i) && userID.equals(users.getJSONObject(i).getString("userID"))) {
+                    // found it!
+                    return i;
                 }
             }
         } catch (JSONException je) {
             // not going to happen in this demo app
+            je.printStackTrace();
         }
 
         // if we got here then we didn't find it
@@ -195,7 +190,7 @@ public class User
     // The Java method will produce content identified by the MIME Media
     // type "application/JSON"
     @Produces("application/JSON")
-    public String deleteUser(String input)
+    public String deleteUser()
     {
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
