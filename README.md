@@ -3,9 +3,9 @@
 
 This sample shows you how to create, read, update, and delete with Spiffy UI forms.  It includes a simple REST server running on Java with [Jersey](http://jersey.java.net/).
 
-Everything starts with a [REST bean](http://www.spiffyui.org/!#rest) named `User.java`.  This bean handles the [CRUD ](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations of our application.  The UI is handled in `Index.java`.
+Everything starts with a [REST bean](http://www.spiffyui.org/!#rest) named `User.java`.  This bean handles the [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations of our application.  The UI is handled in `Index.java`.
 
-This application shows you how to make the full range or REST requests and build complex form layouts with Spiffy UI.
+This application shows you how to make the full range of REST requests and build complex form layouts with Spiffy UI.  All data is stored in memory on the server so there's no additional setup.  Just build it and run.
 
 Building and Running SpiffyForms
 --------------------------------------
