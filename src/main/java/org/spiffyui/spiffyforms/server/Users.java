@@ -15,6 +15,7 @@
  ******************************************************************************/
 package org.spiffyui.spiffyforms.server;
 
+import java.util.logging.Logger;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -23,13 +24,23 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-// The Java class will be hosted at the URI path "/users"
+
+/**
+ * This class supports our REST endpoint for getting a list of the users.  It serves at
+ * /users and only supports GET requests.
+ */
 @Path("/users")
 public class Users
 {
-
-    // maintain a list of users as a JSONArray for easy returning
+    /**
+     * This single variable is our server-side storage.  In a real application you would
+     * probably write these users to a database or an LDAP server, but this sample just
+     * holds all the users in memory as a JSONArray.  That makes it easy to return them
+     * to the client.
+     */
     private static final JSONArray USER_LIST = new JSONArray();
+    
+    private static final Logger LOGGER = Logger.getLogger(Users.class.getName());
 
     static {
 
@@ -60,7 +71,7 @@ public class Users
             USER_LIST.put(demoUser);
 
         } catch (JSONException je) {
-            // not going to happen with this hardcoded data!
+            LOGGER.throwing(Users.class.getName(), "initialization", je);
         }
         /*
          * catch (java.text.ParseException pe) { // also not going to happen }
@@ -72,21 +83,14 @@ public class Users
         return USER_LIST;
     }
 
-    // The Java method will process HTTP GET requests
+    
+    /**
+     * Get the list of users currently on the server.
+     */
     @GET
-    // The Java method will produce content identified by the MIME Media
-    // type "application/JSON"
     @Produces("application/JSON")
     public String doGetRequest()
     {
-        if (USER_LIST != null && USER_LIST.length() == 0) {
-            return "{\"error\": \"user list has no entries\"}";
-        }
-        if (USER_LIST != null && USER_LIST.length() != 0)
-            return USER_LIST.toString();
-        else
-            return "{\"error\": \"user list not initialized\"}";
+        return USER_LIST.toString();
     }
-
-    // what happens if you PUT or POST here? Doesn't seem interesting.
 }

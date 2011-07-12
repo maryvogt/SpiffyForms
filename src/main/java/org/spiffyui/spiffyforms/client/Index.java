@@ -37,8 +37,6 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyPressEvent;
-import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.user.client.Timer;
@@ -53,9 +51,13 @@ import com.google.gwt.user.client.ui.TextBoxBase;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * This class is the main entry point for our GWT module.
+ * Index is the main entry point of our application.  It is also the UI and handles all
+ * of the user interaction, widgets, and application workflow.
+ * 
+ * This UI has a list on top and a form at the bottom.  The list manages the users and
+ * the form edits the details of the specific users.
  */
-public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHandler 
+public class Index implements EntryPoint, ClickHandler, KeyUpHandler 
 {
 
     private static final String WIDE_TEXT_FIELD = "wideTextField";
@@ -304,10 +306,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         updateFormStatus(null);
     }
     
-    // RESTObjectCallBack is a class provided by SpiffyUI.
-    //  A class calling the RESTObjectCallBack only has
-    //  to deal with well formed Java objects in GWT and doesn't need to parse JSON
-    // or handle HTTP errors.
+    /**
+     * This is the first method which calls REST and we call it when the application
+     * first loads.  We make a GET request to the server to get the list of Users from
+     * the server.
+     */
     private void getUsers()
     {
         User.getUsers(new RESTObjectCallBack<User[]>() {
@@ -463,12 +466,6 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     }
 
     @Override
-    public void onKeyPress(KeyPressEvent event)
-    {
-        
-    }
-
-    @Override
     public void onKeyUp(KeyUpEvent event)
     {
         if (event.getNativeKeyCode() != KeyCodes.KEY_TAB) {
@@ -476,6 +473,10 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         }
     }
     
+    /**
+     * This method saves the details about a specific user.  We call this one method to 
+     * create a new user or save an existing user.
+     */
     private void save()
     {
         if (m_currentUser == null) {
@@ -485,6 +486,9 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
         
         m_save.setInProgress(true);
         
+        /*
+         Now we take the data out of our controls and save it into the REST bean
+         */
         m_currentUser.setUserId(m_userId.getText());
         m_currentUser.setFirstName(m_firstName.getText());
         m_currentUser.setLastName(m_lastName.getText());
@@ -499,6 +503,9 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             m_currentUser.setGender("female");
         }
         
+        /*
+         Then we call the bean to save the data to the server
+         */
         m_currentUser.save(new RESTObjectCallBack<Boolean>() {
                 public void success(Boolean b)
                 {
@@ -521,6 +528,11 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
             });
     }
     
+    /**
+     * This method deletes the currently selected user.  In a real application we would 
+     * probably want to prompt first with an "are you sure" style dialog, but this is 
+     * just a sample.
+     */
     private void delete()
     {
         if (m_currentUser == null) {
@@ -684,8 +696,8 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
     }
     
     /**
-     *  Update the status of our form.  This method handles field validation and enabling
-     *  the save button.  This method is called when the user makes any change to the form.
+     * Update the status of our form.  This method handles field validation and enabling
+     * the save button.  This method is called when the user makes any change to the form.
      *  
      * When the user types in the first field we want to validate that field, but we don't
      * want to validate the rest of them since the rest aren't filled in yet and we don't
@@ -734,7 +746,7 @@ public class Index implements EntryPoint, ClickHandler, KeyPressHandler, KeyUpHa
 
 
 /**
- * This is a little class to handle our delete button.  It mostly just handles styling.
+ * This is a little class to handle our delete button.  It mostly just applies styling.
  */
 class DeleteButton extends FancyButton
 {
