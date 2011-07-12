@@ -636,6 +636,7 @@ public class Index implements EntryPoint, ClickHandler, KeyUpHandler
                     } else {
                         m_userIdFeedback.setStatus(FormFeedback.VALID);
                         m_userIdFeedback.setText("This username is available");
+                        m_userIdFeedback.setText("This username is available");
                         m_userId.setTitle("");
                     }
                     

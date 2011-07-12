@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import org.spiffyui.client.JSONUtil;
-import org.spiffyui.client.JSUtil;
 import org.spiffyui.client.MessageUtil;
 import org.spiffyui.client.rest.RESTCallback;
 import org.spiffyui.client.rest.RESTException;
@@ -317,7 +316,7 @@ class User
 
     private static String getURIForID(String userid)
     {
-	return "api/users/" + URL.encodeComponent(userid);
+        return "api/users/" + URL.encodePathSegment(userid);
     }
 	
 }

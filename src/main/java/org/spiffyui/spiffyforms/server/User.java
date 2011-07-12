@@ -127,7 +127,6 @@ public class User
     @Produces("application/JSON")
     public Response createUser(String input)
     {
-        Response resp;
         MultivaluedMap<String, String> params = uriInfo.getPathParameters();
         String userID = params.getFirst("arg1");
         // we know that userID is not null because of the Path annotation
