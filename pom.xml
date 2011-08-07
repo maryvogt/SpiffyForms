@@ -61,7 +61,7 @@
       <plugin>
         <groupId>org.spiffyui.maven.plugins</groupId>
         <artifactId>maven-spiffyui-plugin</artifactId>
-        <version>0.5.2</version>
+        <version>0.5.3</version>
         <extensions>true</extensions>
       </plugin>
       <plugin>
