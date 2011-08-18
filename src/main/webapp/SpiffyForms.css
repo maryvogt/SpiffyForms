@@ -109,3 +109,51 @@ div.spiffy-formfeedback.error {
     width: auto;
     padding-left: 25px;
 }
+
+.dialogformrow {
+    height: auto;
+    position: static;
+}
+
+.dialogformlabel {
+    display: inline-block;
+    width: 175px;
+    vertical-align: top;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    left: auto;
+    position: static;
+    top: auto;
+}
+
+.formcontrolssection {
+    left: auto;
+    position: static;
+    top: auto;
+    width: auto;
+    
+    display: inline-block;
+    margin-left: 20px;
+    vertical-align: top;
+}
+
+.spiffy-formfeedback-inform {
+    display: inline-block;
+    padding-left: 0px;
+    margin-left: 25px;
+    position: static;
+    width: auto;
+    left: auto;
+    top: auto;
+}
+
+.formbuttons {
+    margin-left: 200px;
+    margin-top: 28px;
+}
+
+.extratallformrow {
+    height: auto;
+    position: static;
+}
