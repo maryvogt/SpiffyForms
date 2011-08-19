@@ -5,7 +5,9 @@ This sample shows you how to create, read, update, and delete with Spiffy UI for
 
 Everything starts with a [REST bean](http://www.spiffyui.org/!#rest) named `User.java`.  This bean handles the [CRUD](http://en.wikipedia.org/wiki/Create,_read,_update_and_delete) operations of our application.  The UI is handled in `Index.java`.
 
-This application shows you how to make the full range of REST requests and build complex form layouts with Spiffy UI.  All data is stored in memory on the server so there's no additional setup.  Just build it and run.
+This application shows you how to make the full range of REST requests and build complex form layouts with Spiffy UI.  All data is stored in memory on the server so there's no additional setup.  Just build it and run it and you'll get an application that looks like this:
+
+<img src="http://github.com/maryvogt/SpiffyForms/raw/master/screenshot.png" />
 
 Building and Running SpiffyForms
 --------------------------------------
